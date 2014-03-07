@@ -3,14 +3,6 @@
 #include <algorithm>
 #include "prob_math.h"
 
-namespace {
-int get_num_neighbour_enemies(int region) {
-  return 0;
-}
-
-
-}
-
 void BasicAttackBot::cmd_setupmap_superregions(SettingVector regions) {
   // Is this the best place to do this?
   owner_map["neutral"] = NEUTRAL;
@@ -63,8 +55,9 @@ void BasicAttackBot::cmd_setupmap_neighbours(ConnectionVector connections) {
 
 void BasicAttackBot::cmd_updatemap(UpdateVector updates) {
   for (UpdateVector::iterator it = updates.begin(); it != updates.end(); ++it) {
-    owner[it->region] = owner_map[it->player];
-    occupancy[it->region] = it->amount;
+    int real_region = region_map[it->region];
+    owner[real_region] = owner_map[it->player];
+    occupancy[real_region] = it->amount;
   }
 }
 
@@ -85,7 +78,7 @@ PlacementVector BasicAttackBot::cmd_go_place_armies(long t) {
       max_neighbour_armies = army_neighbours;
     }
   }
-  Placement p = {max_region, place_armies};
+  Placement p = {region_ids[max_region], place_armies};
   PlacementVector pv;
   pv.push_back(p);
 
@@ -119,7 +112,7 @@ MoveVector BasicAttackBot::cmd_go_attacktransfer(long t) {
       }
 
       if (best_attack_region >= 0) {
-        Move m = {r, best_attack_region, occupancy[r] - 1};
+        Move m = {region_ids[r], region_ids[best_attack_region], occupancy[r] - 1};
         moves.push_back(m);
       }
     } else {
@@ -137,12 +130,15 @@ MoveVector BasicAttackBot::cmd_go_attacktransfer(long t) {
       std::random_shuffle(options.begin(), options.end());
 
       if (good_options.size() > 0) {
-        Move m = {r, good_options[0], occupancy[r] - 1};
+        Move m = {region_ids[r], region_ids[good_options[0]], occupancy[r] - 1};
+        moves.push_back(m);
+      } else if (options.size() > 0) {
+        Move m = {region_ids[r], region_ids[options[0]], occupancy[r] - 1};
         moves.push_back(m);
       } else {
-        Move m = {r, options[0], occupancy[r] - 1};
-        moves.push_back(m);
+        //interesting situation, why would code come here?
       }
+
 
     }
   }
