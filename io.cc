@@ -83,7 +83,7 @@ void IOManager::run(BaseBot &bot) {
         bot.cmd_setupmap_superregions(read_pair_list(str));
       } else if (sub_command == "regions") {
         bot.cmd_setupmap_regions(read_pair_list(str));
-      } else if (sub_command == "neighbours") {
+      } else if (sub_command == "neighbors") {
         bot.cmd_setupmap_neighbours(read_neighbour_list(str));
       }
 
@@ -135,7 +135,16 @@ void IOManager::run(BaseBot &bot) {
         std::cout << std::endl;
       } else if (sub_command == "attack/transfer") {
         MoveVector mv = bot.cmd_go_attacktransfer(t);
-        std::cout << "No moves" << std::endl;
+        if (mv.size() == 0) {
+          std::cout << "No moves" << std::endl;
+          continue;
+        }
+        for (MoveVector::iterator it = mv.begin(); it != mv.end(); ++it) {
+//          std::cout << bot.name_me << " place_armies " << it->to << " " << it->amount << ", ";
+          std::cout << bot.name_me << " attack/transfer " << it->from << " " << it->to << " " << it->amount << ", ";
+        }
+
+        std::cout << std::endl;
       }
 
     }

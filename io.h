@@ -10,7 +10,7 @@ public:
   IOManager() {
   }
 
-  void run(BaseBot& bot);
+  void run(BaseBot &bot);
 };
 
 #endif  // CONQUEST_IO_H_
