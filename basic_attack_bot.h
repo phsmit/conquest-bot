@@ -14,6 +14,7 @@ public:
   int get_enemy_neighbour_armies(int region);
   bool has_enemy_neighbours(int region);
 
+  MoveVector generate_attacks(int region);
 };
 
 #endif  // CONQUEST_BASIC_ATTACK_BOT_H_
