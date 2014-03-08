@@ -1,6 +1,7 @@
 #ifndef CONQUEST_BOT_H_
 #define CONQUEST_BOT_H_
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -36,6 +37,7 @@ typedef std::vector<Update> UpdateVector;
 typedef std::pair<int, int> Setting;
 typedef std::vector<Setting> SettingVector;
 
+enum Owner {ME = 0, OTHER = 1, NEUTRAL = 2};
 
 class BaseBot {
 
@@ -61,20 +63,36 @@ public:
   }
 
   virtual void cmd_setupmap_superregions(SettingVector regions) {};
-
   virtual void cmd_setupmap_regions(SettingVector regions) {};
-
   virtual void cmd_setupmap_neighbours(ConnectionVector connections) {};
-
   virtual void cmd_updatemap(UpdateVector updates) {};
-
   virtual void cmd_opponentmoves(MoveVector moves) {};
 
   virtual PlacementVector cmd_go_place_armies(long t) = 0;
-
   virtual MoveVector cmd_go_attacktransfer(long t) = 0;
-
   virtual RegionVector cmd_pick_starting_regions(long t, RegionVector regions) = 0;
+
+};
+
+class SavingBaseBot : public BaseBot {
+public:
+  std::vector<int> super_region_ids;
+  std::vector<int> super_region_reward;
+
+  std::vector<int> region_ids;
+  std::vector<int> region_super_region;
+  std::map<int, int> region_map;
+
+  std::map<std::string, Owner> owner_map;
+  std::vector<Owner> owner;
+  std::vector<int> occupancy;
+
+  std::vector<std::vector<bool> > neighbours;
+
+  virtual void cmd_setupmap_superregions(SettingVector regions);
+  virtual void cmd_setupmap_regions(SettingVector regions);
+  virtual void cmd_setupmap_neighbours(ConnectionVector connections);
+  virtual void cmd_updatemap(UpdateVector updates);
 
 };
 

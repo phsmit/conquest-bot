@@ -39,6 +39,6 @@ ExternalProject_Get_Property(googletest binary_dir)
 
 
 include_directories ( . )
-add_executable( bot bot.cc util.cc io.cc basic_attack_bot.cc old_bots.cc )
+add_executable( bot conquestbot.cc bot.cc util.cc io.cc basic_attack_bot.cc old_bots.cc )
 
 add_subdirectory( helpers )
