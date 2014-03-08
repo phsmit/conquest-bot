@@ -5,18 +5,51 @@
 
 class Strategy {
 protected:
-  BaseBot &bot;
+  SavingBaseBot &bot;
 public:
-  Strategy(BaseBot &bot): bot(bot) {
+  Strategy(SavingBaseBot &bot): bot(bot) {
   }
 
-  void update_needs();
+  virtual bool active() {
+    return false;
+  }
+  virtual void update() {};
 
-  int get_need();
+  virtual double get_cost() {
+    return 0.0;
+  }
+  virtual double get_priority() {
+    return 0.0;
+  }
 
-  PlacementVector place_armies(int n);
+  virtual PlacementVector place_armies(int n) {
+    return PlacementVector();
+  }
 
-  MoveVector do_moves();
+  virtual MoveVector do_moves() {
+    return MoveVector();
+  }
 };
+
+class FootholdStrategy : public Strategy {
+public:
+  FootholdStrategy(SavingBaseBot & bot, int super_region): Strategy(bot) {}
+};
+
+class AquireContinentStrategy : public Strategy {
+public:
+  AquireContinentStrategy(SavingBaseBot & bot, int super_region): Strategy(bot) {}
+};
+
+class DefendContinentStrategy : public Strategy {
+public:
+  DefendContinentStrategy(SavingBaseBot & bot, int super_region): Strategy(bot) {}
+};
+
+class KillAllEnemiesStrategy : public Strategy {
+public:
+  KillAllEnemiesStrategy(SavingBaseBot & bot): Strategy(bot) {}
+};
+
 
 #endif //CONQUEST_STRATEGY_H_
