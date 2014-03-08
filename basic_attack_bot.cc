@@ -1,5 +1,6 @@
 #include "basic_attack_bot.h"
 
+#include <cstdlib>
 #include <algorithm>
 #include "prob_math.h"
 
@@ -82,6 +83,8 @@ MoveVector BasicAttackBot::cmd_go_attacktransfer(long t) {
 
 RegionVector BasicAttackBot::cmd_pick_starting_regions(long t, RegionVector regions) {
   RegionVector rv;
+  std::srand(regions[0]);
+  std::random_shuffle(regions.begin(), regions.end());
   for (int i = 0; i < 6; ++i) {
     rv.push_back(regions[i]);
   }
