@@ -57,7 +57,7 @@ MoveVector BasicAttackBot::cmd_go_attacktransfer(long t) {
       std::vector<int> options;
       std::vector<int> good_options;
       for (size_t neigh_region = 0; neigh_region < region_ids.size(); ++neigh_region) {
-        if (!neighbours[r][neigh_region]) break;
+        if (!neighbours[r][neigh_region]) continue;
         options.push_back(neigh_region);
         if (has_enemy_neighbours(neigh_region)) {
           good_options.push_back(neigh_region);
