@@ -88,6 +88,7 @@ public:
   std::vector<int> occupancy;
 
   std::vector<std::vector<bool> > neighbours;
+  std::vector<std::vector<int> > distances;
 
   virtual void cmd_setupmap_superregions(SettingVector regions);
   virtual void cmd_setupmap_regions(SettingVector regions);

@@ -54,30 +54,27 @@ MoveVector BasicAttackBot::cmd_go_attacktransfer(long t) {
         moves.push_back(m);
       }
     } else {
-      std::vector<int> options;
-      std::vector<int> good_options;
-      for (size_t neigh_region = 0; neigh_region < region_ids.size(); ++neigh_region) {
-        if (!neighbours[r][neigh_region]) continue;
-        options.push_back(neigh_region);
-        if (has_enemy_neighbours(neigh_region)) {
-          good_options.push_back(neigh_region);
+      int closest_enemy_region = -1;
+      int enemy_distance = region_ids.size();
+      for (size_t possible_region = 0; possible_region < region_ids.size(); ++possible_region) {
+        if (owner[r] == ME) continue;
+        if (distances[r][possible_region] < closest_enemy_region) {
+          closest_enemy_region = possible_region;
+          enemy_distance = distances[r][possible_region];
         }
       }
 
-      std::random_shuffle(good_options.begin(), good_options.end());
-      std::random_shuffle(options.begin(), options.end());
-
-      if (good_options.size() > 0) {
-        Move m = {region_ids[r], region_ids[good_options[0]], occupancy[r] - 1};
-        moves.push_back(m);
-      } else if (options.size() > 0) {
-        Move m = {region_ids[r], region_ids[options[0]], occupancy[r] - 1};
-        moves.push_back(m);
-      } else {
-        //interesting situation, why would code come here?
+      int target_region = -1;
+      for (size_t neigh_region = 0; neigh_region < region_ids.size(); ++neigh_region) {
+        if (!neighbours[r][neigh_region]) continue;
+        if (distances[neigh_region][closest_enemy_region] < enemy_distance) {
+          target_region = neigh_region;
+          break;
+        }
       }
 
-
+      Move m = {region_ids[r], region_ids[target_region], occupancy[r]-1};
+      moves.push_back(m);
     }
   }
   return moves;

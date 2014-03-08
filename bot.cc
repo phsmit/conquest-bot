@@ -1,5 +1,14 @@
 #include "bot.h"
 
+namespace {
+bool has_negative_values(std::vector<int> v) {
+  for (std::vector<int>::iterator it = v.begin(); it != v.end(); ++it) {
+    if (*it < 0) return true;
+  }
+  return false;
+}
+}
+
 void SavingBaseBot::cmd_setupmap_superregions(SettingVector regions) {
   // Is this the best place to do this?
   owner_map["neutral"] = NEUTRAL;
@@ -48,6 +57,26 @@ void SavingBaseBot::cmd_setupmap_neighbours(ConnectionVector connections) {
       neighbours[p2][p1] = true;
     }
   }
+
+  std::vector<int> distance_row(region_ids.size(), -1);
+  distances = std::vector<std::vector<int> >(region_ids.size(), distance_row);
+
+  for (int region = 0; region < region_ids.size(); ++region) {
+    distances[region][region] = 0;
+    while(has_negative_values(distances[region])) {
+      for (int test_region = 0; test_region < region_ids.size(); ++test_region) {
+        if (distances[region][test_region] >= 0) continue;
+        for (int neigh_region = 0; neigh_region < region_ids.size(); ++neigh_region) {
+          if (distances[region][neigh_region] >= 0) {
+            distances[region][test_region] = distances[region][neigh_region] +1;
+            distances[test_region][region] = distances[region][test_region];
+          }
+        }
+      }
+    }
+  }
+
+
 }
 
 void SavingBaseBot::cmd_updatemap(UpdateVector updates) {
