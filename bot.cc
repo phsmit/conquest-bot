@@ -63,12 +63,12 @@ void SavingBaseBot::cmd_setupmap_neighbours(ConnectionVector connections) {
 
   for (int region = 0; region < region_ids.size(); ++region) {
     distances[region][region] = 0;
-    while(has_negative_values(distances[region])) {
+    while (has_negative_values(distances[region])) {
       for (int test_region = 0; test_region < region_ids.size(); ++test_region) {
         if (distances[region][test_region] >= 0) continue;
         for (int neigh_region = 0; neigh_region < region_ids.size(); ++neigh_region) {
           if (distances[region][neigh_region] >= 0) {
-            distances[region][test_region] = distances[region][neigh_region] +1;
+            distances[region][test_region] = distances[region][neigh_region] + 1;
             distances[test_region][region] = distances[region][test_region];
           }
         }
@@ -85,4 +85,23 @@ void SavingBaseBot::cmd_updatemap(UpdateVector updates) {
     owner[real_region] = owner_map[it->player];
     occupancy[real_region] = it->amount;
   }
+}
+
+
+int SavingBaseBot::get_enemy_neighbour_armies(int region) {
+  int num_neighbours = 0;
+  for (size_t r = 0; r < region_ids.size(); ++r) {
+    if (!neighbours[region][r]) continue;
+    if (owner[r] == ME) continue;
+    num_neighbours += occupancy[r];
+  }
+  return num_neighbours;
+}
+
+bool SavingBaseBot::has_enemy_neighbours(int region) {
+  for (size_t r = 0; r < region_ids.size(); ++r) {
+    if (!neighbours[region][r]) continue;
+    if (owner[r] != ME) return true;
+  }
+  return false;
 }

@@ -1,14 +1,10 @@
 #include "io.h"
-#include "basic_attack_bot.h"
-#include "strategy_manager.h"
-
+#include "strategy_bot.h"
 
 
 int main(int argc, const char *argv[]) {
 
-  BasicAttackBot bot;
-
-  StrategyManager sm(bot);
+  StrategyBot bot;
 
   IOManager io;
   io.run(bot);

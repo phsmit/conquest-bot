@@ -13,11 +13,14 @@ public:
   virtual bool active() {
     return false;
   }
-  virtual void update() {};
+
+  virtual void update() {
+  };
 
   virtual double get_cost() {
     return 0.0;
   }
+
   virtual double get_priority() {
     return 0.0;
   }
@@ -33,22 +36,46 @@ public:
 
 class FootholdStrategy : public Strategy {
 public:
-  FootholdStrategy(SavingBaseBot & bot, int super_region): Strategy(bot) {}
+  FootholdStrategy(SavingBaseBot &bot, int super_region): Strategy(bot) {
+  }
 };
 
 class AquireContinentStrategy : public Strategy {
 public:
-  AquireContinentStrategy(SavingBaseBot & bot, int super_region): Strategy(bot) {}
+  AquireContinentStrategy(SavingBaseBot &bot, int super_region): Strategy(bot) {
+  }
 };
 
 class DefendContinentStrategy : public Strategy {
 public:
-  DefendContinentStrategy(SavingBaseBot & bot, int super_region): Strategy(bot) {}
+  DefendContinentStrategy(SavingBaseBot &bot, int super_region): Strategy(bot) {
+  }
 };
 
 class KillAllEnemiesStrategy : public Strategy {
 public:
-  KillAllEnemiesStrategy(SavingBaseBot & bot): Strategy(bot) {}
+  KillAllEnemiesStrategy(SavingBaseBot &bot): Strategy(bot) {
+  }
+};
+
+class BasicStrategy : public Strategy {
+public:
+  BasicStrategy(SavingBaseBot &bot): Strategy(bot) {
+  }
+
+  virtual bool active();
+
+  virtual void update();
+
+  virtual double get_cost();
+
+  virtual double get_priority();
+
+  virtual PlacementVector place_armies(int n);
+
+  virtual MoveVector do_moves();
+
+  MoveVector generate_attacks(int region);
 };
 
 

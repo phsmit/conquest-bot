@@ -1,3 +1,6 @@
+#ifndef CONQUEST_PROB_MATH_H_
+#define CONQUEST_PROB_MATH_H_
+
 namespace conquest {
 namespace internal {
 
@@ -54,3 +57,5 @@ double get_win_prob(int attackers, int defenders) {
 
 }
 }
+
+#endif // CONQUEST_PROB_MATH_H_

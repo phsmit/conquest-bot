@@ -8,7 +8,9 @@
 struct Connection {
   int from;
   std::vector<int> to;
-  Connection(int from, std::vector<int> to): from(from), to(to) {};
+
+  Connection(int from, std::vector<int> to): from(from), to(to) {
+  };
 };
 
 struct Placement {
@@ -26,7 +28,9 @@ struct Update {
   int region;
   std::string player;
   int amount;
-  Update(int region, std::string player, int amount): region(region), player(player), amount(amount) {};
+
+  Update(int region, std::string player, int amount): region(region), player(player), amount(amount) {
+  };
 };
 
 typedef std::vector<int> RegionVector;
@@ -37,7 +41,9 @@ typedef std::vector<Update> UpdateVector;
 typedef std::pair<int, int> Setting;
 typedef std::vector<Setting> SettingVector;
 
-enum Owner {ME = 0, OTHER = 1, NEUTRAL = 2};
+enum Owner {
+  ME = 0, OTHER = 1, NEUTRAL = 2
+};
 
 class BaseBot {
 
@@ -47,7 +53,8 @@ public:
   int turn;
   int place_armies;
 
-  BaseBot(): turn(0), place_armies(0) {}
+  BaseBot(): turn(0), place_armies(0) {
+  }
 
   void cmd_settings_opponent(std::string name) {
     name_opponent = name;
@@ -62,14 +69,25 @@ public:
     place_armies = num_armies;
   }
 
-  virtual void cmd_setupmap_superregions(SettingVector regions) {};
-  virtual void cmd_setupmap_regions(SettingVector regions) {};
-  virtual void cmd_setupmap_neighbours(ConnectionVector connections) {};
-  virtual void cmd_updatemap(UpdateVector updates) {};
-  virtual void cmd_opponentmoves(MoveVector moves) {};
+  virtual void cmd_setupmap_superregions(SettingVector regions) {
+  };
+
+  virtual void cmd_setupmap_regions(SettingVector regions) {
+  };
+
+  virtual void cmd_setupmap_neighbours(ConnectionVector connections) {
+  };
+
+  virtual void cmd_updatemap(UpdateVector updates) {
+  };
+
+  virtual void cmd_opponentmoves(MoveVector moves) {
+  };
 
   virtual PlacementVector cmd_go_place_armies(long t) = 0;
+
   virtual MoveVector cmd_go_attacktransfer(long t) = 0;
+
   virtual RegionVector cmd_pick_starting_regions(long t, RegionVector regions) = 0;
 
 };
@@ -91,9 +109,16 @@ public:
   std::vector<std::vector<int> > distances;
 
   virtual void cmd_setupmap_superregions(SettingVector regions);
+
   virtual void cmd_setupmap_regions(SettingVector regions);
+
   virtual void cmd_setupmap_neighbours(ConnectionVector connections);
+
   virtual void cmd_updatemap(UpdateVector updates);
+
+  int get_enemy_neighbour_armies(int region);
+
+  bool has_enemy_neighbours(int region);
 
 };
 
