@@ -41,7 +41,7 @@ PlacementVector BasicStrategy::place_armies(int n) {
   }
   Placement p = {bot.region_ids[max_region], n};
   PlacementVector pv;
-  pv.push_back(p);
+  if(n > 0) pv.push_back(p);
 
   // add the armies to occupancy
   bot.occupancy[max_region] += n;
@@ -169,7 +169,7 @@ PlacementVector AquireContinentStrategy::place_armies(int n) {
   }
   Placement p = {bot.region_ids[max_region], n};
   PlacementVector pv;
-  pv.push_back(p);
+  if(n > 0) pv.push_back(p);
 
   // add the armies to occupancy
   bot.occupancy[max_region] += n;
