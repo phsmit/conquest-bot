@@ -6,7 +6,9 @@
 class Strategy {
 protected:
   SavingBaseBot &bot;
+
 public:
+  std::string name;
   Strategy(SavingBaseBot &bot): bot(bot) {
   }
 
@@ -29,7 +31,7 @@ public:
     return PlacementVector();
   }
 
-  virtual MoveVector do_moves() {
+  virtual MoveVector do_moves(std::vector<int>& armies) {
     return MoveVector();
   }
 };
@@ -54,6 +56,8 @@ private:
 public:
   AquireContinentStrategy(SavingBaseBot &bot, int super_region): Strategy(bot), super_region(super_region) {
     WIN_PROB = 0.8;
+
+    name = "Aquire " + bot.super_region_names[super_region];
   }
 
   virtual bool active() {return active_;}
@@ -63,7 +67,9 @@ public:
   virtual double get_priority() const {return 2.0;}
 
   virtual PlacementVector place_armies(int n);
-  virtual MoveVector do_moves();
+  virtual MoveVector do_moves(std::vector<int>& armies);
+
+  int get_local_neighbour_armies(int region);
 
 };
 
@@ -82,6 +88,7 @@ public:
 class BasicStrategy : public Strategy {
 public:
   BasicStrategy(SavingBaseBot &bot): Strategy(bot) {
+    name = "Basic strategy";
   }
 
   virtual bool active();
@@ -94,9 +101,9 @@ public:
 
   virtual PlacementVector place_armies(int n);
 
-  virtual MoveVector do_moves();
+  virtual MoveVector do_moves(std::vector<int>& armies);
 
-  MoveVector generate_attacks(int region);
+  MoveVector generate_attacks(int region, std::vector<int>& armies);
 };
 
 

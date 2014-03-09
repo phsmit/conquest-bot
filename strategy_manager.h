@@ -3,6 +3,7 @@
 
 #include "strategy.h"
 #include <algorithm>
+#include <iostream>
 
 namespace {
 int count_armies(PlacementVector& pv) {
@@ -21,15 +22,10 @@ class StrategyManager {
 public:
   std::vector<Strategy *> strategies;
   SavingBaseBot &bot;
+  bool initialized;
 
   StrategyManager(SavingBaseBot &bot): bot(bot) {
-    for (int super_region = 0; super_region < bot.super_region_ids.size(); ++super_region) {
-      strategies.push_back(new FootholdStrategy(bot, super_region));
-      strategies.push_back(new AquireContinentStrategy(bot, super_region));
-      strategies.push_back(new DefendContinentStrategy(bot, super_region));
-    }
-    strategies.push_back(new KillAllEnemiesStrategy(bot));
-    strategies.push_back(new BasicStrategy(bot));
+    initialized  = false;
   };
 
   ~StrategyManager() {
@@ -38,7 +34,19 @@ public:
     }
   }
 
+  void init() {
+    for (int super_region = 0; super_region < bot.super_region_ids.size(); ++super_region) {
+      strategies.push_back(new FootholdStrategy(bot, super_region));
+      strategies.push_back(new AquireContinentStrategy(bot, super_region));
+      strategies.push_back(new DefendContinentStrategy(bot, super_region));
+    }
+    strategies.push_back(new KillAllEnemiesStrategy(bot));
+    strategies.push_back(new BasicStrategy(bot));
+    initialized = true;
+  }
+
   void update_strategies() {
+    if(!initialized) init();
     for (std::vector<Strategy *>::iterator it = strategies.begin(); it != strategies.end(); ++it) {
       (*it)->update();
     }
@@ -55,6 +63,7 @@ public:
   }
 
   PlacementVector place_armies() {
+    std::cerr << "Round " << bot.turn << std::endl;
     update_strategies();
 
     PlacementVector pv;
@@ -62,6 +71,7 @@ public:
 
     for (int s = 0; s < strategies.size(); ++s) {
       if (strategies[s]->active()) {
+        std::cerr << strategies[s]->name << " active" << std::endl;
         int need = strategies[s]->armies_needed();
 
         PlacementVector ret = strategies[s]->place_armies(std::min(need, armies_available));
@@ -73,10 +83,16 @@ public:
   }
 
   MoveVector make_moves() {
+    std::vector<int> army_surplus(bot.region_ids.size(), 0);
+    for (int r = 0; r < bot.region_ids.size(); ++r) {
+      if (bot.owner[r] != ME) continue;
+      army_surplus[r] = bot.occupancy[r] - 1;
+    }
+
     MoveVector mv;
     for (int s = 0; s < strategies.size(); ++s) {
       if (strategies[s]->active()) {
-        MoveVector ret = strategies[s]->do_moves();
+        MoveVector ret = strategies[s]->do_moves(army_surplus);
         mv.insert(mv.end(), ret.begin(), ret.end());
       }
     }

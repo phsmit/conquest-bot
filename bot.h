@@ -108,6 +108,17 @@ public:
   std::vector<std::vector<bool> > neighbours;
   std::vector<std::vector<int> > distances;
 
+  std::vector<std::string> super_region_names;
+
+  SavingBaseBot() {
+    super_region_names.push_back("North America");
+    super_region_names.push_back("South America");
+    super_region_names.push_back("Europe");
+    super_region_names.push_back("Africa");
+    super_region_names.push_back("Asia");
+    super_region_names.push_back("Australia");
+  }
+
   virtual void cmd_setupmap_superregions(SettingVector regions);
 
   virtual void cmd_setupmap_regions(SettingVector regions);
