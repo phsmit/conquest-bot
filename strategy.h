@@ -17,11 +17,11 @@ public:
   virtual void update() {
   };
 
-  virtual double get_cost() {
-    return 0.0;
+  virtual int armies_needed() {
+    return 0;
   }
 
-  virtual double get_priority() {
+  virtual double get_priority() const {
     return 0.0;
   }
 
@@ -41,9 +41,30 @@ public:
 };
 
 class AquireContinentStrategy : public Strategy {
+private:
+  double WIN_PROB;
+  const int super_region;
+  int enemy_armies;
+  int regions_missing;
+  int my_surplus_armies;
+  int need;
+
+  bool active_;
+
 public:
-  AquireContinentStrategy(SavingBaseBot &bot, int super_region): Strategy(bot) {
+  AquireContinentStrategy(SavingBaseBot &bot, int super_region): Strategy(bot), super_region(super_region) {
+    WIN_PROB = 0.8;
   }
+
+  virtual bool active() {return active_;}
+  virtual void update();
+  virtual int armies_needed();
+
+  virtual double get_priority() const {return 2.0;}
+
+  virtual PlacementVector place_armies(int n);
+  virtual MoveVector do_moves();
+
 };
 
 class DefendContinentStrategy : public Strategy {
@@ -67,9 +88,9 @@ public:
 
   virtual void update();
 
-  virtual double get_cost();
+  virtual int armies_needed();
 
-  virtual double get_priority();
+  virtual double get_priority() const;
 
   virtual PlacementVector place_armies(int n);
 

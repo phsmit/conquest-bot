@@ -2,7 +2,21 @@
 #define CONQUEST_STRATEGY_MANAGER_H_
 
 #include "strategy.h"
+#include <algorithm>
 
+namespace {
+int count_armies(PlacementVector& pv) {
+  int armies = 0;
+  for (PlacementVector::iterator it = pv.begin(); it != pv.end(); ++it) {
+    armies += it->amount;
+  }
+  return armies;
+}
+
+bool compareStrategy(const Strategy * s1, const Strategy * s2) {
+  return s1->get_priority() > s2->get_priority();
+}
+}
 class StrategyManager {
 public:
   std::vector<Strategy *> strategies;
@@ -28,15 +42,31 @@ public:
     for (std::vector<Strategy *>::iterator it = strategies.begin(); it != strategies.end(); ++it) {
       (*it)->update();
     }
+
+//    struct {
+//      bool operator()(const Strategy * s1, const Strategy * s2)
+//      {
+//        return s1->get_priority() > s2->get_priority();
+//      }
+//    } strategyMore;
+    std::sort(strategies.begin(), strategies.end(), compareStrategy);
+//    std::sort(strategies.begin(), strategies.end());
+
   }
 
   PlacementVector place_armies() {
+    update_strategies();
+
     PlacementVector pv;
+    int armies_available = bot.place_armies;
+
     for (int s = 0; s < strategies.size(); ++s) {
       if (strategies[s]->active()) {
-        PlacementVector ret = strategies[s]->place_armies(bot.place_armies);
+        int need = strategies[s]->armies_needed();
+
+        PlacementVector ret = strategies[s]->place_armies(std::min(need, armies_available));
+        armies_available -= count_armies(ret);
         pv.insert(pv.end(), ret.begin(), ret.end());
-        break;
       }
     }
     return pv;

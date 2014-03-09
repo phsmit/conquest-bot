@@ -18,11 +18,11 @@ bool BasicStrategy::active() {
 void BasicStrategy::update() {
 }
 
-double BasicStrategy::get_cost() {
-  return 0.0;
+int BasicStrategy::armies_needed() {
+  return 10000;
 }
 
-double BasicStrategy::get_priority() {
+double BasicStrategy::get_priority() const {
   return 0.0;
 }
 
@@ -120,3 +120,57 @@ MoveVector BasicStrategy::generate_attacks(int r) {
   return moves;
 }
 
+void AquireContinentStrategy::update() {
+  my_surplus_armies = 0;
+  enemy_armies = 0;
+  regions_missing = 0;
+  need = 0;
+  active_ = false;
+
+  for (int r = 0; r < bot.region_ids.size(); ++r) {
+    if (bot.region_super_region[r] != super_region) continue;
+
+    if (bot.owner[r] == ME) {
+      my_surplus_armies += bot.occupancy[r] - 1;
+      active_ = true;
+    } else {
+      enemy_armies += bot.occupancy[r];
+      regions_missing += 1;
+    }
+
+    while (conquest::internal::get_win_prob(my_surplus_armies + need - regions_missing, enemy_armies) < WIN_PROB) {
+      ++need;
+    }
+  }
+}
+
+int AquireContinentStrategy::armies_needed() {
+  return need;
+}
+
+PlacementVector AquireContinentStrategy::place_armies(int n) {
+  int max_neighbour_armies = 0;
+  int max_region = 0;
+
+  for (size_t r = 0; r < bot.region_ids.size(); ++r) {
+    if (bot.owner[r] != ME) continue;
+    if (bot.region_super_region[r] != super_region) continue;
+
+    int army_neighbours = bot.get_enemy_neighbour_armies(r);
+    if (army_neighbours > max_neighbour_armies) {
+      max_region = r;
+      max_neighbour_armies = army_neighbours;
+    }
+  }
+  Placement p = {bot.region_ids[max_region], n};
+  PlacementVector pv;
+  pv.push_back(p);
+
+  // add the armies to occupancy
+  bot.occupancy[max_region] += n;
+  return pv;
+}
+
+MoveVector AquireContinentStrategy::do_moves() {
+  return Strategy::do_moves();
+}
