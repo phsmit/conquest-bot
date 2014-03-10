@@ -55,7 +55,7 @@ private:
 
 public:
   AquireContinentStrategy(SavingBaseBot &bot, int super_region): Strategy(bot), super_region(super_region) {
-    WIN_PROB = 0.8;
+    WIN_PROB = 0.9;
 
     name = "Aquire " + bot.super_region_names[super_region];
   }

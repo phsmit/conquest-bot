@@ -47,6 +47,7 @@ void SavingBaseBot::cmd_setupmap_regions(SettingVector regions) {
 void SavingBaseBot::cmd_setupmap_neighbours(ConnectionVector connections) {
   std::vector<bool> neighbours_row(region_ids.size(), false);
   neighbours = std::vector<std::vector<bool> >(region_ids.size(), neighbours_row);
+  neighbour_ids = std::vector<std::vector<int> >(region_ids.size());
 
   for (ConnectionVector::iterator it = connections.begin(); it != connections.end(); ++it) {
     for (std::vector<int>::iterator it2 = it->to.begin(); it2 != it->to.end(); ++it2) {
@@ -55,6 +56,9 @@ void SavingBaseBot::cmd_setupmap_neighbours(ConnectionVector connections) {
 
       neighbours[p1][p2] = true;
       neighbours[p2][p1] = true;
+
+      neighbour_ids[p1].push_back(p2);
+      neighbour_ids[p2].push_back(p1);
     }
   }
 

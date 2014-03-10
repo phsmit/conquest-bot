@@ -54,6 +54,11 @@ double get_win_prob(int attackers, int defenders) {
   return attack_success * (1 - defence_succes);
 }
 
+int attackers_needed(int defenders, double win_chance) {
+  int attackers = defenders;
+  while(get_win_prob(attackers, defenders) < win_chance) ++attackers;
+  return attackers;
+}
 
 }
 }

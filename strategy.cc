@@ -9,6 +9,14 @@ bool element_in_vector(int element, std::vector<int> v) {
   }
   return false;
 }
+
+int sum_vector(std::vector<int> v) {
+  int sum = 0;
+  for (std::vector<int>::iterator it = v.begin(); it != v.end(); ++it) {
+    sum += *it;
+  }
+  return sum;
+}
 }
 
 bool BasicStrategy::active() {
@@ -122,53 +130,52 @@ MoveVector BasicStrategy::generate_attacks(int r, std::vector<int>& armies) {
 }
 
 void AquireContinentStrategy::update() {
-  int regions_missing = 0;
-  need = 0;
+  int indirect_enemies = 0;
+
+  std::vector<int> unused_armies(bot.region_ids.size(), 0);
+  std::vector<int> army_need(bot.region_ids.size(), 0);
+
   active_ = false;
+  bool enemies_present = false;
 
   for (int r = 0; r < bot.region_ids.size(); ++r) {
     if (bot.region_super_region[r] != super_region) continue;
-    if (bot.owner[r] == ME) {
+    if (bot.owner[r] != ME) {
+      enemies_present = true;
+    } else {
       active_ = true;
-      continue;
-    };
+      unused_armies[r] = bot.occupancy[r] - 1;
+    }
+  }
 
-    regions_missing += 1;
+  if (!enemies_present) active_ = false;
+  if (!active_) return;
 
-    int max_neighbours = 0;
+  for (int r = 0; r < bot.region_ids.size(); ++r) {
+    if (bot.region_super_region[r] != super_region) continue;
+    if (bot.owner[r] == ME) continue;
 
+    int armies_needed = conquest::internal::attackers_needed(bot.occupancy[r], WIN_PROB);
+    int optimal_neighbour_id = -1;
+    int optimal_neighbour_armies = 0;
     for (int nr = 0; nr < bot.region_ids.size(); ++nr) {
       if (!bot.neighbours[r][nr]) continue;
-      if (bot.owner[nr] != ME) continue;
-      if (bot.occupancy[nr] > max_neighbours) {
-        max_neighbours = bot.occupancy[nr];
+      if ((unused_armies[nr] < optimal_neighbour_armies && unused_armies[nr] >= armies_needed) ||
+          (unused_armies[nr] > optimal_neighbour_armies && optimal_neighbour_armies < armies_needed)) {
+        optimal_neighbour_armies = unused_armies[nr];
+        optimal_neighbour_id = nr;
       }
     }
-
-    int local_need = 0;
-    while (conquest::internal::get_win_prob(max_neighbours - 1 + local_need, bot.occupancy[r]) < WIN_PROB) {
-      ++local_need;
+    if (optimal_neighbour_id >= 0) {
+      int armies_used = std::min(unused_armies[optimal_neighbour_id], armies_needed);
+      unused_armies[optimal_neighbour_id] -= armies_used;
+      army_need[optimal_neighbour_id] += armies_needed - armies_used;
+    } else {
+      indirect_enemies += bot.occupancy[r];
     }
-
-    need += local_need;
-
-//
-//    if (bot.owner[r] == ME) {
-//      my_surplus_armies += bot.occupancy[r] - 1;
-//      active_ = true;
-//    } else {
-//      enemy_armies += bot.occupancy[r];
-//      regions_missing += 1;
-//    }
-//
-//    while (conquest::internal::get_win_prob(my_surplus_armies + need - regions_missing, enemy_armies) < WIN_PROB) {
-//      ++need;
-//    }
   }
 
-  if (regions_missing == 0) {
-    active_ = false;
-  }
+  need = conquest::internal::attackers_needed(indirect_enemies, WIN_PROB) + sum_vector(army_need);
 }
 
 int AquireContinentStrategy::armies_needed() {

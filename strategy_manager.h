@@ -71,8 +71,8 @@ public:
 
     for (int s = 0; s < strategies.size(); ++s) {
       if (strategies[s]->active()) {
-        std::cerr << strategies[s]->name << " active" << std::endl;
         int need = strategies[s]->armies_needed();
+        std::cerr << strategies[s]->name << " active. Army need: " << need << std::endl;
 
         PlacementVector ret = strategies[s]->place_armies(std::min(need, armies_available));
         armies_available -= count_armies(ret);

@@ -106,6 +106,7 @@ public:
   std::vector<int> occupancy;
 
   std::vector<std::vector<bool> > neighbours;
+  std::vector<std::vector<int> > neighbour_ids;
   std::vector<std::vector<int> > distances;
 
   std::vector<std::string> super_region_names;
