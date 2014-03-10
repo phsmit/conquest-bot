@@ -4,15 +4,15 @@
 #include <iomanip>
 
 int main(int argc, const char *argv[]) {
-  int dim = 10;
+  int dim = 20;
   using namespace std;
-  cout << "  | ";
+  cout << "    | ";
   for (int i = 1; i < dim; ++i) {
-    cout << "    " << i << " | ";
+    cout << "   " << std::setw(2) << i << " | ";
   }
   cout << endl;
 
-  cout << "--|-";
+  cout << "----|-";
 
   for (int i = 1; i < dim; ++i) {
     cout << "------|-";
@@ -23,7 +23,7 @@ int main(int argc, const char *argv[]) {
 
 
   for (int j = 1; j < dim; ++j) {
-    cout << j << " | ";
+    cout << std::setw(3) << j << " | ";
 
     for (int i = 1; i < dim; ++i) {
       cout << setprecision(3) << conquest::internal::get_win_prob(j, i) << " | ";

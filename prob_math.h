@@ -26,7 +26,7 @@ double log_bin_coefficient(int n, int k) {
 
 double kill_exactly_n(int trials, int n, double prob) {
   assert (trials >= n);
-  if (trials > 10) {
+  if (trials > 20) {
     return exp(log(pow(prob, n)) + log(pow((1.0 - prob), trials - n))
         + log_bin_coefficient(trials - n, n));
   }
@@ -35,7 +35,9 @@ double kill_exactly_n(int trials, int n, double prob) {
 
 double win_chance(int attackers, int defenders, double attack_prob) {
   if (attackers < defenders) return 0.0;
-  if (attackers - defenders > 10) return 1.0;
+  if (attackers >  defenders * 2 ) return 1.0;
+
+  if (attackers > 20) return 0.0;
 
   double win_chance = 0.0;
   for (int n = defenders; n <= attackers; ++n) {
