@@ -84,10 +84,20 @@ void SavingBaseBot::cmd_setupmap_neighbours(ConnectionVector connections) {
 }
 
 void SavingBaseBot::cmd_updatemap(UpdateVector updates) {
+  std::vector<bool> updated(region_ids.size(), false);
   for (UpdateVector::iterator it = updates.begin(); it != updates.end(); ++it) {
     int real_region = region_map[it->region];
     owner[real_region] = owner_map[it->player];
     occupancy[real_region] = it->amount;
+    updated[real_region] = true;
+  }
+
+  for (int r = 0; r < region_ids.size(); ++r) {
+    if (owner[r] != ME) continue;
+    if (!updated[r]) {
+      owner[r] = OTHER;
+      occupancy[r] = 2;
+    }
   }
 }
 
