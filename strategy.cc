@@ -70,7 +70,7 @@ MoveVector BasicStrategy::do_moves(std::vector<int>& armies) {
       int closest_enemy_region = -1;
       int enemy_distance = bot.region_ids.size();
       for (size_t possible_region = 0; possible_region < bot.region_ids.size(); ++possible_region) {
-        if (bot.owner[r] == ME) continue;
+        if (bot.owner[possible_region] == ME) continue;
         if (bot.distances[r][possible_region] < closest_enemy_region) {
           closest_enemy_region = possible_region;
           enemy_distance = bot.distances[r][possible_region];
@@ -96,7 +96,6 @@ MoveVector BasicStrategy::do_moves(std::vector<int>& armies) {
 }
 
 MoveVector BasicStrategy::generate_attacks(int r, std::vector<int>& armies) {
-  int armies_available = armies[r];
   MoveVector moves;
   std::vector<int> excluded_regions;
   while (true) {
