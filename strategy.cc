@@ -71,7 +71,7 @@ MoveVector BasicStrategy::do_moves(std::vector<int>& armies) {
       int enemy_distance = bot.region_ids.size();
       for (size_t possible_region = 0; possible_region < bot.region_ids.size(); ++possible_region) {
         if (bot.owner[possible_region] == ME) continue;
-        if (bot.distances[r][possible_region] < closest_enemy_region) {
+        if (bot.distances[r][possible_region] < enemy_distance) {
           closest_enemy_region = possible_region;
           enemy_distance = bot.distances[r][possible_region];
         }
