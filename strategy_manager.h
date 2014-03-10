@@ -46,6 +46,9 @@ public:
   }
 
   void update_strategies() {
+    if (bot.turn == 9) {
+      std::cerr << "hi" << std::endl;
+    }
     if(!initialized) init();
     for (std::vector<Strategy *>::iterator it = strategies.begin(); it != strategies.end(); ++it) {
       (*it)->update();

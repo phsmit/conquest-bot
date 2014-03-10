@@ -184,6 +184,7 @@ int AquireContinentStrategy::armies_needed() {
 PlacementVector AquireContinentStrategy::place_armies(int n) {
   PlacementVector pv;
   for (int r = 0; r < bot.region_ids.size(); ++r) {
+    if (bot.region_super_region[r] != super_region) continue;
     if (army_need[r] > 0) {
       int armies_used = std::min(n, army_need[r]);
       army_need[r] -= armies_used;
