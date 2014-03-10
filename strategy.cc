@@ -189,7 +189,7 @@ PlacementVector AquireContinentStrategy::place_armies(int n) {
       int armies_used = std::min(n, army_need[r]);
       army_need[r] -= armies_used;
       n -= armies_used;
-      Placement p = {bot.region_ids[r], n};
+      Placement p = {bot.region_ids[r], armies_used};
       if(n > 0) pv.push_back(p);
     }
   }
