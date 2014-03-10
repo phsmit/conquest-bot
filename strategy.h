@@ -39,6 +39,7 @@ public:
 class FootholdStrategy : public Strategy {
 public:
   FootholdStrategy(SavingBaseBot &bot, int super_region): Strategy(bot) {
+    name = "INACTIVE Foothold " + bot.super_region_names[super_region];
   }
 };
 
@@ -66,7 +67,7 @@ public:
   virtual void update();
   virtual int armies_needed();
 
-  virtual double get_priority() const {return 2.0;}
+  virtual double get_priority() const {return -1.0 * need;}
 
   virtual PlacementVector place_armies(int n);
   virtual MoveVector do_moves(std::vector<int>& armies);
@@ -78,12 +79,14 @@ public:
 class DefendContinentStrategy : public Strategy {
 public:
   DefendContinentStrategy(SavingBaseBot &bot, int super_region): Strategy(bot) {
+    name = "INACTIVE Defend " + bot.super_region_names[super_region];
   }
 };
 
 class KillAllEnemiesStrategy : public Strategy {
 public:
   KillAllEnemiesStrategy(SavingBaseBot &bot): Strategy(bot) {
+    name = "INACTIVE KILLALLENEMIES ";
   }
 };
 

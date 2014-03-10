@@ -51,15 +51,7 @@ public:
       (*it)->update();
     }
 
-//    struct {
-//      bool operator()(const Strategy * s1, const Strategy * s2)
-//      {
-//        return s1->get_priority() > s2->get_priority();
-//      }
-//    } strategyMore;
     std::sort(strategies.begin(), strategies.end(), compareStrategy);
-//    std::sort(strategies.begin(), strategies.end());
-
   }
 
   PlacementVector place_armies() {

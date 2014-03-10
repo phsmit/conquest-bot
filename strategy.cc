@@ -31,7 +31,7 @@ int BasicStrategy::armies_needed() {
 }
 
 double BasicStrategy::get_priority() const {
-  return 0.0;
+  return -1.0 * 100000;
 }
 
 PlacementVector BasicStrategy::place_armies(int n) {
