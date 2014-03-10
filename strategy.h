@@ -46,9 +46,9 @@ class AquireContinentStrategy : public Strategy {
 private:
   double WIN_PROB;
   const int super_region;
-  int enemy_armies;
-  int regions_missing;
-  int my_surplus_armies;
+//  int enemy_armies;
+//  int regions_missing;
+//  int my_surplus_armies;
   int need;
 
   bool active_;
