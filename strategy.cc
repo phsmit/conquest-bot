@@ -133,7 +133,7 @@ void AquireContinentStrategy::update() {
   int indirect_enemies = 0;
 
   std::vector<int> unused_armies(bot.region_ids.size(), 0);
-  std::vector<int> army_need(bot.region_ids.size(), 0);
+  army_need = std::vector<int> (bot.region_ids.size(), 0);
 
   active_ = false;
   bool enemies_present = false;
@@ -183,25 +183,28 @@ int AquireContinentStrategy::armies_needed() {
 }
 
 PlacementVector AquireContinentStrategy::place_armies(int n) {
-  int max_neighbour_armies = 0;
-  int max_region = 0;
+  PlacementVector pv;
+  for (int r = 0; r < bot.region_ids.size(); ++r) {
+    if (army_need[r] > 0) {
+      int armies_used = std::min(n, army_need[r]);
+      army_need[r] -= armies_used;
+      n -= armies_used;
+      Placement p = {bot.region_ids[r], n};
+      if(n > 0) pv.push_back(p);
+    }
+  }
+
+  if (n == 0) return pv;
 
   for (size_t r = 0; r < bot.region_ids.size(); ++r) {
     if (bot.owner[r] != ME) continue;
     if (bot.region_super_region[r] != super_region) continue;
 
-    int army_neighbours = get_local_neighbour_armies(r);
-    if (army_neighbours > max_neighbour_armies) {
-      max_region = r;
-      max_neighbour_armies = army_neighbours;
-    }
-  }
-  Placement p = {bot.region_ids[max_region], n};
-  PlacementVector pv;
-  if(n > 0) pv.push_back(p);
+    Placement p = {bot.region_ids[r], n};
+    pv.push_back(p);
+    break;
 
-  // add the armies to occupancy
-  bot.occupancy[max_region] += n;
+  }
   return pv;
 }
 

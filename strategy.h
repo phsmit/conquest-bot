@@ -53,6 +53,8 @@ private:
 
   bool active_;
 
+  std::vector<int> army_need;
+
 public:
   AquireContinentStrategy(SavingBaseBot &bot, int super_region): Strategy(bot), super_region(super_region) {
     WIN_PROB = 0.9;
