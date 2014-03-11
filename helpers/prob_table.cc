@@ -4,7 +4,7 @@
 #include <iomanip>
 
 int main(int argc, const char *argv[]) {
-  int dim = 20;
+  int dim = 40;
   using namespace std;
   cout << "    | ";
   for (int i = 1; i < dim; ++i) {
