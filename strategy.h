@@ -99,6 +99,8 @@ public:
 
   int get_local_neighbour_armies(int region);
 
+  MoveVector generate_attacks(int region, std::vector<int> &armies);
+
 };
 
 class DefendContinentStrategy : public Strategy {

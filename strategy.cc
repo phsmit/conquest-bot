@@ -210,7 +210,77 @@ PlacementVector AquireContinentStrategy::place_armies(int n) {
 }
 
 MoveVector AquireContinentStrategy::do_moves(std::vector<int>& armies) {
-  return MoveVector();
+  MoveVector moves;
+
+  for (size_t r = 0; r < bot.region_ids.size(); ++r) {
+    if (bot.owner[r] != ME) continue;
+    if (bot.region_super_region[r] != super_region) continue;
+    if (armies[r] == 0) continue;
+
+    if (bot.has_enemy_neighbours(r)) {
+      MoveVector attack_moves = generate_attacks(r, armies);
+      moves.insert(moves.end(), attack_moves.begin(), attack_moves.end());
+    } else {
+      int closest_enemy_region = -1;
+      int enemy_distance = bot.region_ids.size();
+      for (size_t possible_region = 0; possible_region < bot.region_ids.size(); ++possible_region) {
+        if (bot.owner[possible_region] == ME) continue;
+        if (bot.distances[r][possible_region] < closest_enemy_region) {
+          closest_enemy_region = possible_region;
+          enemy_distance = bot.distances[r][possible_region];
+        }
+      }
+
+      int target_region = -1;
+      for (size_t neigh_region = 0; neigh_region < bot.region_ids.size(); ++neigh_region) {
+        if (!bot.neighbours[r][neigh_region]) continue;
+        if (bot.distances[neigh_region][closest_enemy_region] < enemy_distance) {
+          target_region = neigh_region;
+          break;
+        }
+      }
+
+      Move m = {bot.region_ids[r], bot.region_ids[target_region], armies[r]};
+      armies[r] = 0;
+      moves.push_back(m);
+    }
+  }
+  return moves;
+
+}
+
+MoveVector AquireContinentStrategy::generate_attacks(int r, std::vector<int> &armies) {
+  MoveVector moves;
+  std::vector<int> excluded_regions;
+  while (true) {
+    int best_attack_region = -1;
+    int best_num_enemies = 0;
+    for (size_t enemy_region = 0; enemy_region < bot.region_ids.size(); ++enemy_region) {
+      if (!bot.neighbours[r][enemy_region]) continue;
+      if (bot.owner[enemy_region] == ME) continue;
+      if (bot.region_super_region[enemy_region] != super_region) continue;
+      if (element_in_vector(enemy_region, excluded_regions)) continue;
+      if (conquest::internal::get_win_prob(armies[r], bot.occupancy[enemy_region]) > 0.8) {
+        if (bot.occupancy[enemy_region] > best_num_enemies) {
+          best_num_enemies = bot.occupancy[enemy_region];
+          best_attack_region = enemy_region;
+        }
+      }
+    }
+
+    if (best_attack_region >= 0) {
+      int necessary_armies = armies[r];
+      while (conquest::internal::get_win_prob(necessary_armies, bot.occupancy[best_attack_region]) > 0.8) necessary_armies--;
+      necessary_armies++;
+      Move m = {bot.region_ids[r], bot.region_ids[best_attack_region], necessary_armies};
+      armies[r] -= necessary_armies;
+      moves.push_back(m);
+      excluded_regions.push_back(best_attack_region);
+    } else {
+      break;
+    }
+  }
+  return moves;
 }
 
 int AquireContinentStrategy::get_local_neighbour_armies(int region) {
