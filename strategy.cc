@@ -230,7 +230,7 @@ void DefenseStrategy::update() {
   for (size_t r = 0; r < bot.region_ids.size(); ++r) {
     if (bot.owner[r] != ME) continue;
     for (int nr = 0; nr < bot.region_ids.size(); ++nr) {
-      if (!bot.owner[nr] == OTHER) continue;
+      if (bot.owner[nr] != OTHER) continue;
       if (!bot.neighbours[r][nr]) continue;
 
       int attackers = bot.occupancy[nr] + expected_increase - 1;
