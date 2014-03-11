@@ -223,3 +223,49 @@ int AquireContinentStrategy::get_local_neighbour_armies(int region) {
   }
   return num_neighbours;
 }
+
+void DefenseStrategy::update() {
+  active_ = false;
+  need = std::vector<int>(bot.region_ids.size(), 0);
+  for (size_t r = 0; r < bot.region_ids.size(); ++r) {
+    if (bot.owner[r] != ME) continue;
+    for (int nr = 0; nr < bot.region_ids.size(); ++nr) {
+      if (!bot.owner[nr] == OTHER) continue;
+      if (!bot.neighbours[r][nr]) continue;
+
+      int attackers = bot.occupancy[nr] + expected_increase - 1;
+      int defenders = conquest::internal::defenders_needed(attackers, DEFENSE_PROB);
+      if (bot.occupancy[r] + need[r] < defenders) {
+        need[r] = defenders - bot.occupancy[r];
+        active_ = true;
+      }
+    }
+  }
+}
+
+bool DefenseStrategy::active() {
+  return active_;
+}
+
+int DefenseStrategy::armies_needed() {
+  return sum_vector(need);
+}
+
+double DefenseStrategy::get_priority() const {
+  return -1 * sum_vector(need);
+}
+
+PlacementVector DefenseStrategy::place_armies(int n) {
+  PlacementVector pv;
+  for (size_t r = 0; r < bot.region_ids.size(); ++r) {
+    if (need[r] > 0) {
+      int armies_used = std::min(n, need[r]);
+      n -= armies_used;
+      Placement p = {bot.region_ids[r], armies_used};
+      bot.occupancy[r] += armies_used;
+      if (armies_used > 0) pv.push_back(p);
+    }
+  }
+
+  return pv;
+}

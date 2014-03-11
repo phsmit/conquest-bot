@@ -42,6 +42,7 @@ public:
     }
     strategies.push_back(new KillAllEnemiesStrategy(bot));
     strategies.push_back(new BasicStrategy(bot));
+    strategies.push_back(new DefenseStrategy(bot));
     initialized = true;
   }
 

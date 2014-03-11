@@ -36,6 +36,31 @@ public:
   }
 };
 
+class DefenseStrategy : public Strategy {
+private:
+  double DEFENSE_PROB;
+  int expected_increase;
+  std::vector<int> need;
+  bool active_;
+
+public:
+  DefenseStrategy(SavingBaseBot &bot): Strategy(bot) {
+    name = "Defense strategy";
+    DEFENSE_PROB = 0.5;
+    expected_increase = 5;
+  }
+
+  virtual bool active();
+
+  virtual void update();
+
+  virtual int armies_needed();
+
+  virtual double get_priority() const;
+
+  virtual PlacementVector place_armies(int n);
+};
+
 class FootholdStrategy : public Strategy {
 public:
   FootholdStrategy(SavingBaseBot &bot, int super_region): Strategy(bot) {

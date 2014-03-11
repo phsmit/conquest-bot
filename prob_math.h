@@ -42,6 +42,14 @@ int attackers_needed(int defenders, double win_chance) {
 
 }
 
+int defenders_needed(int attackers, double defend_chance) {
+  if (attackers <= 0) return 0;
+  int defenders = 0;
+  while (get_win_prob(attackers, defenders) > (1 - defend_chance)) ++defenders;
+
+  return defenders;
+}
+
 }
 }
 
