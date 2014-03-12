@@ -18,10 +18,9 @@ std::vector<std::vector<int> > make_distance_mat(std::vector<std::vector<int> > 
     while (has_negative_values(distances[region])) {
       for (int test_region = 0; test_region < neighbours.size(); ++test_region) {
         if (distances[region][test_region] >= 0) continue;
-        //TODO, this is not correct!!!!
-        for (int neigh_region = 0; neigh_region < neighbours.size(); ++neigh_region) {
-          if (distances[region][neigh_region] >= 0) {
-            distances[region][test_region] = distances[region][neigh_region] + 1;
+        for (std::vector<int>::iterator it = neighbours[region].begin(); it != neighbours[region].end(); ++it) {
+          if (distances[region][*it] >= 0) {
+            distances[region][test_region] = distances[region][*it] + 1;
             distances[test_region][region] = distances[region][test_region];
           }
         }

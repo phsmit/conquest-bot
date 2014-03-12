@@ -132,7 +132,7 @@ void AquireContinentStrategy::update() {
   int indirect_enemies = 0;
 
   std::vector<int> unused_armies(bot.region_n, 0);
-  army_need = std::vector<int>(bot.region_n, 0);
+  army_need = std::vector<int>((size_t) bot.region_n, 0);
 
   active_ = false;
   bool enemies_present = false;
@@ -225,7 +225,7 @@ MoveVector AquireContinentStrategy::do_moves(std::vector<int> &armies) {
       int enemy_distance = bot.region_n;
       for (size_t possible_region = 0; possible_region < bot.region_n; ++possible_region) {
         if (bot.owner[possible_region] == ME) continue;
-        if (bot.distances[r][possible_region] < closest_enemy_region) { // bug!!! (not fixed yet because of refactoring)
+        if (bot.distances[r][possible_region] < enemy_distance) { // bug!!! (not fixed yet because of refactoring)
           closest_enemy_region = possible_region;
           enemy_distance = bot.distances[r][possible_region];
         }
@@ -296,7 +296,7 @@ int AquireContinentStrategy::get_local_neighbour_armies(int region) {
 
 void DefenseStrategy::update() {
   active_ = false;
-  need = std::vector<int>(bot.region_n, 0);
+  need = std::vector<int>((size_t) bot.region_n, 0);
   for (size_t r = 0; r < bot.region_n; ++r) {
     if (bot.owner[r] != ME) continue;
     for (int nr = 0; nr < bot.region_n; ++nr) {
