@@ -86,8 +86,9 @@ MoveVector BasicStrategy::do_moves(std::vector<int> &armies) {
         }
       }
 
-      armies[r] = 0;
       Move m = {r, target_region, armies[r]};
+      armies[r] = 0;
+      moves.push_back(m);
     }
   }
   return moves;
@@ -224,7 +225,7 @@ MoveVector AquireContinentStrategy::do_moves(std::vector<int> &armies) {
       int enemy_distance = bot.region_n;
       for (size_t possible_region = 0; possible_region < bot.region_n; ++possible_region) {
         if (bot.owner[possible_region] == ME) continue;
-        if (bot.distances[r][possible_region] < closest_enemy_region) {
+        if (bot.distances[r][possible_region] < closest_enemy_region) { // bug!!! (not fixed yet because of refactoring)
           closest_enemy_region = possible_region;
           enemy_distance = bot.distances[r][possible_region];
         }
