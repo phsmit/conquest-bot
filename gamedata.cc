@@ -86,7 +86,7 @@ bool GameData::has_enemy_neighbours(int region) const {
 
 int GameData::count_neighbour_armies(int region, Owner owner_) const {
   int count = 0;
-  for (std::vector<int>::iterator neighbour_it = neighbour_ids[region].begin(); neighbour_it != neighbour_ids[region].end(); ++neighbour_it) {
+  for (std::vector<int>::const_iterator neighbour_it = neighbour_ids[region].begin(); neighbour_it != neighbour_ids[region].end(); ++neighbour_it) {
     if (owner[*neighbour_it] == owner_) count += occupancy[*neighbour_it];
   }
   return count;

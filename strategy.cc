@@ -104,7 +104,7 @@ MoveVector BasicStrategy::generate_attacks(int r, std::vector<int> &armies) {
   MoveVector moves;
   std::vector<int> regions_done;
 
-  for (std::vector<int>::iterator it = bot.neighbour_ids[r].begin(); it != bot.neighbour_ids[r].end(); ++it) {
+  for (std::vector<int>::const_iterator it = bot.neighbour_ids[r].begin(); it != bot.neighbour_ids[r].end(); ++it) {
     if (bot.owner[*it] == ME) continue;
     targets.insert(*it);
   }
