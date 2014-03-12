@@ -27,6 +27,8 @@ public:
   int get_enemy_neighbour_armies(int region) const;
 
   bool has_enemy_neighbours(int region) const;
+
+  int count_neighbour_armies(int region, Owner owner) const;
 };
 
 #endif // CONQUEST_GAMEDATA_H_
