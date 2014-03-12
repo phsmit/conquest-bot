@@ -269,34 +269,51 @@ MoveVector AquireContinentStrategy::do_moves(std::vector<int> &armies) {
 }
 
 MoveVector AquireContinentStrategy::generate_attacks(int r, std::vector<int> &armies) {
+  double MIN_WIN_PROB = 0.8;
+  std::set<int> targets;
+
   MoveVector moves;
-  std::vector<int> excluded_regions;
-  while (true) {
+  std::vector<int> regions_done;
+
+  for (std::vector<int>::const_iterator it = bot.neighbour_ids[r].begin(); it != bot.neighbour_ids[r].end(); ++it) {
+    if (bot.owner[*it] == ME) continue;
+    if (bot.region_super[*it] != super_region) continue;
+    targets.insert(*it);
+  }
+
+  while (targets.size() > 0) {
     int best_attack_region = -1;
     int best_num_enemies = 0;
-    for (size_t enemy_region = 0; enemy_region < bot.region_n; ++enemy_region) {
-      if (!bot.neighbours[r][enemy_region]) continue;
-      if (bot.owner[enemy_region] == ME) continue;
-      if (bot.region_super[enemy_region] != super_region) continue;
-      if (element_in_vector(enemy_region, excluded_regions)) continue;
-      if (conquest::internal::get_win_prob(armies[r], bot.occupancy[enemy_region]) > 0.8) {
-        if (bot.occupancy[enemy_region] > best_num_enemies) {
-          best_num_enemies = bot.occupancy[enemy_region];
-          best_attack_region = enemy_region;
+    for (std::set<int>::iterator it = targets.begin(); it != targets.end(); ++it) {
+      if (conquest::internal::get_win_prob(armies[r], bot.occupancy[*it]) > MIN_WIN_PROB) {
+        if (bot.occupancy[*it] > best_num_enemies) {
+          best_num_enemies = bot.occupancy[*it];
+          best_attack_region = *it;
         }
       }
     }
-
     if (best_attack_region >= 0) {
-      int necessary_armies = armies[r];
-      while (conquest::internal::get_win_prob(necessary_armies, bot.occupancy[best_attack_region]) > 0.8) necessary_armies--;
-      necessary_armies++;
+      int necessary_armies = conquest::internal::attackers_needed(best_num_enemies, MIN_WIN_PROB);
       armies[r] -= necessary_armies;
       Move m = {r, best_attack_region, necessary_armies};
       moves.push_back(m);
-      excluded_regions.push_back(best_attack_region);
+      targets.erase(best_attack_region);
     } else {
       break;
+    }
+  }
+
+  bool all_other_attacked = true;
+  for (std::set<int>::iterator it = targets.begin(); it != targets.end(); ++it) {
+    if (bot.owner[*it] == OTHER) all_other_attacked = false;
+  }
+
+  if (all_other_attacked && moves.size() > 0) {
+    int i = 0;
+    while (armies[r] > 0) {
+      moves[i].amount++;
+      armies[r]--;
+      i = (i + 1) % moves.size();
     }
   }
   return moves;
