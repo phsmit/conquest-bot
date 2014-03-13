@@ -3,21 +3,21 @@
 
 #include "strategy_manager.h"
 
-class IOManager2 {
+class IOManager {
 private:
-  std::vector<int> region_id;
-  std::vector<int> super_id;
+  RegionVector region_id;
+  RegionVector super_id;
   CanonicalGameSetup game_setup;
 
-  void write_picks(std::vector<int> regions);
+  void write_picks(RegionVector regions);
 
-  void write_moves(std::vector<Move> moves);
+  void write_moves(MoveVector moves);
 
   void write_placements(PlacementVector placements);
 
-  MoveVector parse_moves(std::string data);
+  MoveVector parse_moves(str data);
 
-  UpdateVector2 parse_updates(std::string data);
+  UpdateVector parse_updates(str data);
 
 
 public:

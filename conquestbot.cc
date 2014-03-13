@@ -2,7 +2,7 @@
 
 int main(int argc, const char *argv[]) {
 
-  IOManager2 io = IOManager2();
+  IOManager io = IOManager();
 
   CanonicalGameSetup game_setup = io.run_setup();
   GameData game_data(game_setup);

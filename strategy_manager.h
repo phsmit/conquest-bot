@@ -8,8 +8,8 @@
 #include <iostream>
 
 namespace {
-int count_armies(PlacementVector &pv) {
-  int armies = 0;
+army_t count_armies(PlacementVector &pv) {
+  army_t armies = 0;
   for (PlacementVector::iterator it = pv.begin(); it != pv.end(); ++it) {
     armies += it->amount;
   }
@@ -28,7 +28,7 @@ public:
 
   int turn;
 
-  int avail_armies;
+  army_t avail_armies;
 
   StrategyManager(GameData &bot): bot(bot) {
     initialized = false;
@@ -41,7 +41,7 @@ public:
   }
 
   void init() {
-    for (int super_region = 0; super_region < bot.super_n; ++super_region) {
+    for (reg_t super_region = 0; super_region < bot.super_n; ++super_region) {
       strategies.push_back(new FootholdStrategy(bot, super_region));
       strategies.push_back(new AquireContinentStrategy(bot, super_region));
       strategies.push_back(new DefendContinentStrategy(bot, super_region));
@@ -66,11 +66,11 @@ public:
     update_strategies();
 
     PlacementVector pv;
-    int armies_available = avail_armies;
+    army_t armies_available = avail_armies;
 
-    for (int s = 0; s < strategies.size(); ++s) {
+    for (size_t s = 0; s < strategies.size(); ++s) {
       if (strategies[s]->active()) {
-        int need = strategies[s]->armies_needed();
+        army_t need = strategies[s]->armies_needed();
         std::cerr << strategies[s]->name << " active. Army need: " << need << std::endl;
 
         PlacementVector ret = strategies[s]->place_armies(std::min(need, armies_available));
@@ -82,14 +82,14 @@ public:
   }
 
   MoveVector make_moves() {
-    std::vector<int> army_surplus(bot.region_n, 0);
-    for (int r = 0; r < bot.region_n; ++r) {
+    std::vector<army_t> army_surplus(bot.region_n, 0);
+    for (reg_t r = 0; r < bot.region_n; ++r) {
       if (bot.owner[r] != ME) continue;
       army_surplus[r] = bot.occupancy[r] - 1;
     }
 
     MoveVector mv;
-    for (int s = 0; s < strategies.size(); ++s) {
+    for (size_t s = 0; s < strategies.size(); ++s) {
       if (strategies[s]->active()) {
         MoveVector ret = strategies[s]->do_moves(army_surplus);
         mv.insert(mv.end(), ret.begin(), ret.end());
@@ -102,17 +102,17 @@ public:
     return false;
   }
 
-  void process_updates(UpdateVector2 updates) {
-    std::vector<bool> updated(bot.region_n, false);
-    for (UpdateVector2::iterator it = updates.begin(); it != updates.end(); ++it) {
+  void process_updates(UpdateVector updates) {
+    bot.visible = std::vector<bool>(bot.region_n, false);
+    for (UpdateVector::iterator it = updates.begin(); it != updates.end(); ++it) {
       bot.owner[it->region] = it->player;
       bot.occupancy[it->region] = it->amount;
-      updated[it->region] = true;
+      bot.visible[it->region] = true;
     }
 
-    for (int r = 0; r < bot.region_n; ++r) {
+    for (reg_t r = 0; r < bot.region_n; ++r) {
       if (bot.owner[r] != ME) continue;
-      if (!updated[r]) {
+      if (!bot.visible[r]) {
         bot.owner[r] = OTHER;
         bot.occupancy[r] = 2;
       }
@@ -123,13 +123,13 @@ public:
 //TODO implement
   }
 
-  void start_new_round(int armies) {
+  void start_new_round(army_t armies) {
     turn++;
     avail_armies = armies;
     update_strategies();
   }
 
-  std::vector<int> pick_starting_regions() {
+  RegionVector pick_starting_regions() {
     RegionVector rv;
     RegionVector regions = bot.init_regions;
     std::srand(regions[0] + 1); // plus 1 is to keep compatible with earlier versions

@@ -8,7 +8,7 @@ protected:
   GameData &bot;
 
 public:
-  std::string name;
+  str name;
 
   Strategy(GameData &bot): bot(bot) {
   }
@@ -20,7 +20,7 @@ public:
   virtual void update() {
   };
 
-  virtual int armies_needed() {
+  virtual army_t armies_needed() {
     return 0;
   }
 
@@ -28,11 +28,11 @@ public:
     return 0.0;
   }
 
-  virtual PlacementVector place_armies(int n) {
+  virtual PlacementVector place_armies(army_t n) {
     return PlacementVector();
   }
 
-  virtual MoveVector do_moves(std::vector<int> &armies) {
+  virtual MoveVector do_moves(ArmyVector &armies) {
     return MoveVector();
   }
 };
@@ -40,8 +40,8 @@ public:
 class DefenseStrategy : public Strategy {
 private:
   double DEFENSE_PROB;
-  int expected_increase;
-  std::vector<int> need;
+  army_t expected_increase;
+  ArmyVector need;
   bool active_;
 
 public:
@@ -55,16 +55,16 @@ public:
 
   virtual void update();
 
-  virtual int armies_needed();
+  virtual army_t armies_needed();
 
   virtual double get_priority() const;
 
-  virtual PlacementVector place_armies(int n);
+  virtual PlacementVector place_armies(army_t n);
 };
 
 class FootholdStrategy : public Strategy {
 public:
-  FootholdStrategy(GameData &bot, int super_region): Strategy(bot) {
+  FootholdStrategy(GameData &bot, reg_t super_region): Strategy(bot) {
     name = "INACTIVE Foothold " + bot.super_region_names[super_region];
   }
 };
@@ -72,18 +72,15 @@ public:
 class AquireContinentStrategy : public Strategy {
 private:
   double WIN_PROB;
-  const int super_region;
-//  int enemy_armies;
-//  int regions_missing;
-//  int my_surplus_armies;
-  int need;
+  const reg_t super_region;
+  army_t need;
 
   bool active_;
 
-  std::vector<int> army_need;
+  ArmyVector army_need;
 
 public:
-  AquireContinentStrategy(GameData &bot, int super_region): Strategy(bot), super_region(super_region) {
+  AquireContinentStrategy(GameData &bot, reg_t super_region): Strategy(bot), super_region(super_region) {
     WIN_PROB = 0.9;
 
     name = "Aquire " + bot.super_region_names[super_region];
@@ -95,27 +92,49 @@ public:
 
   virtual void update();
 
-  virtual int armies_needed();
+  virtual army_t armies_needed();
 
   virtual double get_priority() const {
     return -1.0 * need;
   }
 
-  virtual PlacementVector place_armies(int n);
+  virtual PlacementVector place_armies(army_t n);
 
-  virtual MoveVector do_moves(std::vector<int> &armies);
+  virtual MoveVector do_moves(ArmyVector &armies);
 
-  int get_local_neighbour_armies(int region);
+  army_t get_local_neighbour_armies(reg_t region);
 
-  MoveVector generate_attacks(int region, std::vector<int> &armies);
+  MoveVector generate_attacks(reg_t region, ArmyVector &armies);
 
 };
 
 class DefendContinentStrategy : public Strategy {
+private:
+  army_t need;
+  bool active_;
+
 public:
-  DefendContinentStrategy(GameData &bot, int super_region): Strategy(bot) {
-    name = "INACTIVE Defend " + bot.super_region_names[super_region];
+
+  DefendContinentStrategy(GameData &bot, reg_t super_region): Strategy(bot) {
+    name = "Defend " + bot.super_region_names[super_region];
   }
+
+  virtual bool active() {
+    return active_;
+  }
+
+  virtual void update();
+
+  virtual army_t armies_needed();
+
+  virtual double get_priority() const {
+    return -1.0 * need;
+  }
+
+  virtual PlacementVector place_armies(army_t n);
+
+  virtual MoveVector do_moves(ArmyVector &armies);
+
 };
 
 class KillAllEnemiesStrategy : public Strategy {
@@ -135,15 +154,15 @@ public:
 
   virtual void update();
 
-  virtual int armies_needed();
+  virtual army_t armies_needed();
 
   virtual double get_priority() const;
 
-  virtual PlacementVector place_armies(int n);
+  virtual PlacementVector place_armies(army_t n);
 
-  virtual MoveVector do_moves(std::vector<int> &armies);
+  virtual MoveVector do_moves(ArmyVector &armies);
 
-  MoveVector generate_attacks(int region, std::vector<int> &armies);
+  MoveVector generate_attacks(reg_t region, ArmyVector &armies);
 };
 
 

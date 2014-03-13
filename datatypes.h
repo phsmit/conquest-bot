@@ -1,53 +1,55 @@
 #ifndef CONQUEST_DATATYPES_H_
 #define CONQUEST_DATATYPES_H_
 
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
 
-struct Connection {
-  int from;
-  std::vector<int> to;
+typedef __uint16_t reg_t;
+typedef __uint16_t army_t;
+typedef __uint16_t distance_t;
 
-  Connection(int from, std::vector<int> to): from(from), to(to) {
-  };
-};
+const distance_t UNREACHABLE = std::numeric_limits<distance_t>::max();
+const reg_t UNKNOWN_REGION = std::numeric_limits<reg_t>::max();
 
-struct Placement {
-  int to;
-  int amount;
-};
-
-struct Move {
-  int from;
-  int to;
-  int amount;
-};
-
+typedef std::string str;
 
 enum Owner {
   ME = 0, OTHER = 1, NEUTRAL = 2
 };
 
-struct Update2 {
-  int region;
-  Owner player;
-  int amount;
+struct Move {
+  reg_t from;
+  reg_t to;
+  army_t amount;
 };
 
-typedef std::vector<int> RegionVector;
+struct Placement {
+  reg_t to;
+  army_t amount;
+};
+
+struct Update {
+  reg_t region;
+  Owner player;
+  army_t amount;
+};
+
+typedef std::vector<army_t> ArmyVector;
+typedef std::vector<reg_t> RegionVector;
 typedef std::vector<Placement> PlacementVector;
 typedef std::vector<Move> MoveVector;
-typedef std::vector<Update2> UpdateVector2;
+typedef std::vector<Update> UpdateVector;
 
 
 struct CanonicalGameSetup {
-  std::string name_me;
-  std::string name_opponent;
-  std::vector<int> super_award;
-  std::vector<int> region_super;
-  std::vector<std::vector<int> > neighbours;
-  std::vector<int> init_options;
+  str name_me;
+  str name_opponent;
+  ArmyVector super_award;
+  RegionVector region_super;
+  std::vector<RegionVector> neighbours;
+  RegionVector init_options;
 };
 
 #endif //CONQUEST_DATATYPES_H_

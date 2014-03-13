@@ -9,16 +9,16 @@ bool has_negative_values(std::vector<int> v) {
   return false;
 }
 
-std::vector<std::vector<int> > make_distance_mat(std::vector<std::vector<int> > neighbours) {
+std::vector<std::vector<int> > make_distance_mat(std::vector<RegionVector> neighbours) {
   std::vector<int> distance_row(neighbours.size(), -1);
   std::vector<std::vector<int> > distances = std::vector<std::vector<int> >(neighbours.size(), distance_row);
 
-  for (int region = 0; region < neighbours.size(); ++region) {
+  for (size_t region = 0; region < neighbours.size(); ++region) {
     distances[region][region] = 0;
     while (has_negative_values(distances[region])) {
-      for (int test_region = 0; test_region < neighbours.size(); ++test_region) {
+      for (size_t test_region = 0; test_region < neighbours.size(); ++test_region) {
         if (distances[region][test_region] >= 0) continue;
-        for (std::vector<int>::iterator it = neighbours[test_region].begin(); it != neighbours[test_region].end(); ++it) {
+        for (RegionVector::iterator it = neighbours[test_region].begin(); it != neighbours[test_region].end(); ++it) {
           if (distances[region][*it] >= 0) {
             distances[region][test_region] = distances[region][*it] + 1;
             distances[test_region][region] = distances[region][test_region];
@@ -30,12 +30,12 @@ std::vector<std::vector<int> > make_distance_mat(std::vector<std::vector<int> > 
   return distances;
 }
 
-std::vector<std::vector<bool> > make_neighbour_mat(std::vector<std::vector<int> > neighbours) {
+std::vector<std::vector<bool> > make_neighbour_mat(std::vector<RegionVector> neighbours) {
   std::vector<bool> neigbour_row(neighbours.size(), false);
   std::vector<std::vector<bool> > neighbours_mat = std::vector<std::vector<bool> >(neighbours.size(), neigbour_row);
 
   for (int r = 0; r < neighbours.size(); ++r) {
-    for (std::vector<int>::iterator it = neighbours[r].begin(); it != neighbours[r].end(); ++it) {
+    for (RegionVector::iterator it = neighbours[r].begin(); it != neighbours[r].end(); ++it) {
       neighbours_mat[r][*it] = true;
     }
   }
@@ -54,7 +54,8 @@ GameData::GameData(CanonicalGameSetup setup): super_award(setup.super_award),
                                               region_n(setup.region_super.size()),
                                               init_regions(setup.init_options),
                                               owner(std::vector<Owner>(setup.region_super.size(), NEUTRAL)),
-                                              occupancy(std::vector<int>(setup.region_super.size(), 2)) {
+                                              occupancy(ArmyVector(setup.region_super.size(), 2)),
+                                              visible(std::vector<bool>(setup.region_super.size(), false)) {
 
   super_region_names.push_back("North America");
   super_region_names.push_back("South America");
@@ -66,9 +67,9 @@ GameData::GameData(CanonicalGameSetup setup): super_award(setup.super_award),
 }
 
 
-int GameData::get_enemy_neighbour_armies(int region) const {
-  int num_neighbours = 0;
-  for (size_t r = 0; r < region_n; ++r) {
+army_t GameData::get_enemy_neighbour_armies(reg_t region) const {
+  army_t num_neighbours = 0;
+  for (reg_t r = 0; r < region_n; ++r) {
     if (!neighbours[region][r]) continue;
     if (owner[r] == ME) continue;
     num_neighbours += occupancy[r];
@@ -76,17 +77,17 @@ int GameData::get_enemy_neighbour_armies(int region) const {
   return num_neighbours;
 }
 
-bool GameData::has_enemy_neighbours(int region) const {
-  for (size_t r = 0; r < region_n; ++r) {
+bool GameData::has_enemy_neighbours(reg_t region) const {
+  for (reg_t r = 0; r < region_n; ++r) {
     if (!neighbours[region][r]) continue;
     if (owner[r] != ME) return true;
   }
   return false;
 }
 
-int GameData::count_neighbour_armies(int region, Owner owner_) const {
-  int count = 0;
-  for (std::vector<int>::const_iterator neighbour_it = neighbour_ids[region].begin(); neighbour_it != neighbour_ids[region].end(); ++neighbour_it) {
+army_t GameData::count_neighbour_armies(reg_t region, Owner owner_) const {
+  army_t count = 0;
+  for (RegionVector::const_iterator neighbour_it = neighbour_ids[region].begin(); neighbour_it != neighbour_ids[region].end(); ++neighbour_it) {
     if (owner[*neighbour_it] == owner_) count += occupancy[*neighbour_it];
   }
   return count;
