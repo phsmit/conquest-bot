@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 PROJECT(conquest)
 
+if(CMAKE_COMPILER_IS_GNUCXX)
+    add_definitions(-std=c++0x)
+endif()
+
 ##################GTEST
 # Enable ExternalProject CMake module
 include(ExternalProject)

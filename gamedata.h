@@ -17,8 +17,6 @@ public:
 
   const RegionVector init_regions;
 
-  std::vector<str> super_region_names;
-
   std::vector<Owner> owner;
   ArmyVector occupancy;
   std::vector<bool> visible;

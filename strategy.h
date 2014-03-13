@@ -2,15 +2,16 @@
 #define CONQUEST_STRATEGY_H_
 
 #include "gamedata.h"
+#include "names-gen.h"
 
 class Strategy {
 protected:
-  GameData &bot;
+  GameData &data;
 
 public:
   str name;
 
-  Strategy(GameData &bot): bot(bot) {
+  Strategy(GameData &data): data(data) {
   }
   virtual ~Strategy() {}
 
@@ -46,7 +47,7 @@ private:
   bool active_;
 
 public:
-  DefenseStrategy(GameData &bot): Strategy(bot) {
+  DefenseStrategy(GameData &data): Strategy(data) {
     name = "Defense strategy";
     DEFENSE_PROB = 0.5;
     expected_increase = 5;
@@ -65,8 +66,8 @@ public:
 
 class FootholdStrategy : public Strategy {
 public:
-  FootholdStrategy(GameData &bot, reg_t super_region): Strategy(bot) {
-    name = "INACTIVE Foothold " + bot.super_region_names[super_region];
+  FootholdStrategy(GameData &data, reg_t super_region): Strategy(data) {
+    name = "INACTIVE Foothold " + SUPER_REGION_NAMES[super_region];
   }
 };
 
@@ -81,10 +82,10 @@ private:
   ArmyVector army_need;
 
 public:
-  AquireContinentStrategy(GameData &bot, reg_t super_region): Strategy(bot), super_region(super_region) {
+  AquireContinentStrategy(GameData &data, reg_t super_region): Strategy(data), super_region(super_region) {
     WIN_PROB = 0.9;
 
-    name = "Aquire " + bot.super_region_names[super_region];
+    name = "Aquire " + SUPER_REGION_NAMES[super_region];
   }
 
   virtual bool active() {
@@ -116,8 +117,8 @@ private:
 
 public:
 
-  DefendContinentStrategy(GameData &bot, reg_t super_region): Strategy(bot) {
-    name = "Defend " + bot.super_region_names[super_region];
+  DefendContinentStrategy(GameData &data, reg_t super_region): Strategy(data) {
+    name = "Defend " + SUPER_REGION_NAMES[super_region];
   }
 
   virtual bool active() {
@@ -140,14 +141,14 @@ public:
 
 class KillAllEnemiesStrategy : public Strategy {
 public:
-  KillAllEnemiesStrategy(GameData &bot): Strategy(bot) {
+  KillAllEnemiesStrategy(GameData &data): Strategy(data) {
     name = "INACTIVE KILLALLENEMIES ";
   }
 };
 
 class BasicStrategy : public Strategy {
 public:
-  BasicStrategy(GameData &bot): Strategy(bot) {
+  BasicStrategy(GameData &data): Strategy(data) {
     name = "Basic strategy";
   }
 

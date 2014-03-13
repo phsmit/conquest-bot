@@ -2,16 +2,17 @@
 #define CONQUEST_STRATEGY_MANAGER_H_
 
 #include "datatypes.h"
-#include "strategy.h"
 #include "gamedata.h"
+#include "strategy.h"
+#include "util.h"
 #include <algorithm>
 #include <iostream>
 
 namespace {
 army_t count_armies(PlacementVector &pv) {
   army_t armies = 0;
-  for (PlacementVector::iterator it = pv.begin(); it != pv.end(); ++it) {
-    armies += it->amount;
+  for (auto p : pv) {
+    armies += p.amount;
   }
   return armies;
 }
@@ -23,39 +24,39 @@ bool compareStrategy(const Strategy *s1, const Strategy *s2) {
 class StrategyManager {
 public:
   std::vector<Strategy *> strategies;
-  GameData &bot;
+  GameData &data;
   bool initialized;
 
   int turn;
 
   army_t avail_armies;
 
-  StrategyManager(GameData &bot): bot(bot) {
+  StrategyManager(GameData &data): data(data) {
     initialized = false;
   };
 
   ~StrategyManager() {
-    for (std::vector<Strategy *>::iterator it = strategies.begin(); it != strategies.end(); ++it) {
-      delete *it;
+    for (auto strategy : strategies) {
+      delete strategy;
     }
   }
 
   void init() {
-    for (reg_t super_region = 0; super_region < bot.super_n; ++super_region) {
-      strategies.push_back(new FootholdStrategy(bot, super_region));
-      strategies.push_back(new AquireContinentStrategy(bot, super_region));
-      strategies.push_back(new DefendContinentStrategy(bot, super_region));
+    for (auto super_region : make_range(data.super_n)) {
+      strategies.push_back(new FootholdStrategy(data, super_region));
+      strategies.push_back(new AquireContinentStrategy(data, super_region));
+      strategies.push_back(new DefendContinentStrategy(data, super_region));
     }
-    strategies.push_back(new KillAllEnemiesStrategy(bot));
-    strategies.push_back(new BasicStrategy(bot));
-    strategies.push_back(new DefenseStrategy(bot));
+    strategies.push_back(new KillAllEnemiesStrategy(data));
+    strategies.push_back(new BasicStrategy(data));
+    strategies.push_back(new DefenseStrategy(data));
     initialized = true;
   }
 
   void update_strategies() {
     if (!initialized) init();
-    for (std::vector<Strategy *>::iterator it = strategies.begin(); it != strategies.end(); ++it) {
-      (*it)->update();
+    for (auto strategy : strategies) {
+      strategy->update();
     }
 
     std::sort(strategies.begin(), strategies.end(), compareStrategy);
@@ -68,12 +69,13 @@ public:
     PlacementVector pv;
     army_t armies_available = avail_armies;
 
-    for (size_t s = 0; s < strategies.size(); ++s) {
-      if (strategies[s]->active()) {
-        army_t need = strategies[s]->armies_needed();
-        std::cerr << strategies[s]->name << " active. Army need: " << need << std::endl;
+    //for (size_t s = 0; s < strategies.size(); ++s) {
+    for (auto strategy : strategies) {
+      if (strategy->active()) {
+        army_t need = strategy->armies_needed();
+        std::cerr << strategy->name << " active. Army need: " << need << std::endl;
 
-        PlacementVector ret = strategies[s]->place_armies(std::min(need, armies_available));
+        PlacementVector ret = strategy->place_armies(std::min(need, armies_available));
         armies_available -= count_armies(ret);
         pv.insert(pv.end(), ret.begin(), ret.end());
       }
@@ -82,16 +84,16 @@ public:
   }
 
   MoveVector make_moves() {
-    std::vector<army_t> army_surplus(bot.region_n, 0);
-    for (reg_t r = 0; r < bot.region_n; ++r) {
-      if (bot.owner[r] != ME) continue;
-      army_surplus[r] = bot.occupancy[r] - 1;
+    std::vector<army_t> army_surplus(data.region_n, 0);
+    for (auto r : make_range(data.region_n)) {
+      if (data.owner[r] != ME) continue;
+      army_surplus[r] = data.occupancy[r] - 1;
     }
 
     MoveVector mv;
-    for (size_t s = 0; s < strategies.size(); ++s) {
-      if (strategies[s]->active()) {
-        MoveVector ret = strategies[s]->do_moves(army_surplus);
+    for (auto strategy : strategies) {
+      if (strategy->active()) {
+        MoveVector ret = strategy->do_moves(army_surplus);
         mv.insert(mv.end(), ret.begin(), ret.end());
       }
     }
@@ -103,18 +105,18 @@ public:
   }
 
   void process_updates(UpdateVector updates) {
-    bot.visible = std::vector<bool>(bot.region_n, false);
+    data.visible = std::vector<bool>(data.region_n, false);
     for (UpdateVector::iterator it = updates.begin(); it != updates.end(); ++it) {
-      bot.owner[it->region] = it->player;
-      bot.occupancy[it->region] = it->amount;
-      bot.visible[it->region] = true;
+      data.owner[it->region] = it->player;
+      data.occupancy[it->region] = it->amount;
+      data.visible[it->region] = true;
     }
 
-    for (reg_t r = 0; r < bot.region_n; ++r) {
-      if (bot.owner[r] != ME) continue;
-      if (!bot.visible[r]) {
-        bot.owner[r] = OTHER;
-        bot.occupancy[r] = 2;
+    for (reg_t r = 0; r < data.region_n; ++r) {
+      if (data.owner[r] != ME) continue;
+      if (!data.visible[r]) {
+        data.owner[r] = OTHER;
+        data.occupancy[r] = 2;
       }
     }
   }
@@ -131,7 +133,7 @@ public:
 
   RegionVector pick_starting_regions() {
     RegionVector rv;
-    RegionVector regions = bot.init_regions;
+    RegionVector regions = data.init_regions;
     std::srand(regions[0] + 1); // plus 1 is to keep compatible with earlier versions
     std::random_shuffle(regions.begin(), regions.end());
     for (int i = 0; i < 6; ++i) {

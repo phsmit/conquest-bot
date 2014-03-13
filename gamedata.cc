@@ -1,10 +1,11 @@
+#include "util.h"
 #include "gamedata.h"
 
 namespace {
 
 bool has_negative_values(std::vector<int> v) {
-  for (std::vector<int>::iterator it = v.begin(); it != v.end(); ++it) {
-    if (*it < 0) return true;
+  for (auto value : v) {
+    if (value < 0) return true;
   }
   return false;
 }
@@ -34,9 +35,9 @@ std::vector<std::vector<bool> > make_neighbour_mat(std::vector<RegionVector> nei
   std::vector<bool> neigbour_row(neighbours.size(), false);
   std::vector<std::vector<bool> > neighbours_mat = std::vector<std::vector<bool> >(neighbours.size(), neigbour_row);
 
-  for (reg_t r = 0; r < neighbours.size(); ++r) {
-    for (RegionVector::iterator it = neighbours[r].begin(); it != neighbours[r].end(); ++it) {
-      neighbours_mat[r][*it] = true;
+  for (auto r : make_range(neighbours.size())) {
+    for (auto neighbour : neighbours[r]) {
+      neighbours_mat[r][neighbour] = true;
     }
   }
 
@@ -56,20 +57,12 @@ GameData::GameData(CanonicalGameSetup setup): super_award(setup.super_award),
                                               owner(std::vector<Owner>(setup.region_super.size(), NEUTRAL)),
                                               occupancy(ArmyVector(setup.region_super.size(), 2)),
                                               visible(std::vector<bool>(setup.region_super.size(), false)) {
-
-  super_region_names.push_back("North America");
-  super_region_names.push_back("South America");
-  super_region_names.push_back("Europe");
-  super_region_names.push_back("Africa");
-  super_region_names.push_back("Asia");
-  super_region_names.push_back("Australia");
-
 }
 
 
 army_t GameData::get_enemy_neighbour_armies(reg_t region) const {
   army_t num_neighbours = 0;
-  for (reg_t r = 0; r < region_n; ++r) {
+  for (auto r : make_range(region_n)) {
     if (!neighbours[region][r]) continue;
     if (owner[r] == ME) continue;
     num_neighbours += occupancy[r];
@@ -78,7 +71,7 @@ army_t GameData::get_enemy_neighbour_armies(reg_t region) const {
 }
 
 bool GameData::has_enemy_neighbours(reg_t region) const {
-  for (reg_t r = 0; r < region_n; ++r) {
+  for (auto r : make_range(region_n)) {
     if (!neighbours[region][r]) continue;
     if (owner[r] != ME) return true;
   }
@@ -87,8 +80,9 @@ bool GameData::has_enemy_neighbours(reg_t region) const {
 
 army_t GameData::count_neighbour_armies(reg_t region, Owner owner_) const {
   army_t count = 0;
-  for (RegionVector::const_iterator neighbour_it = neighbour_ids[region].begin(); neighbour_it != neighbour_ids[region].end(); ++neighbour_it) {
-    if (owner[*neighbour_it] == owner_) count += occupancy[*neighbour_it];
+  for (auto neighbour : neighbour_ids[region]) {
+    if (owner[neighbour] == owner_)
+      count += occupancy[neighbour];
   }
   return count;
 }

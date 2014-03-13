@@ -1,14 +1,16 @@
 #ifndef CONQUEST_DATATYPES_H_
 #define CONQUEST_DATATYPES_H_
 
+#include <cstdint>
+
 #include <limits>
 #include <string>
 #include <utility>
 #include <vector>
 
-typedef __uint16_t reg_t;
-typedef __uint16_t army_t;
-typedef __uint16_t distance_t;
+typedef uint_fast16_t reg_t;
+typedef uint_fast16_t army_t;
+typedef uint_fast16_t distance_t;
 
 const distance_t UNREACHABLE = std::numeric_limits<distance_t>::max();
 const reg_t UNKNOWN_REGION = std::numeric_limits<reg_t>::max();

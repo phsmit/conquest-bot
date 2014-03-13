@@ -12,3 +12,5 @@ target_link_libraries(
 add_executable( test_debugger test_debugger.cc )
 add_executable( prob_table prob_table.cc )
 add_executable( test_sort test_sort.cc )
+
+add_executable( test_range test_range.cc )
