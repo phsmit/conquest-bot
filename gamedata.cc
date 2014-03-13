@@ -34,7 +34,7 @@ std::vector<std::vector<bool> > make_neighbour_mat(std::vector<RegionVector> nei
   std::vector<bool> neigbour_row(neighbours.size(), false);
   std::vector<std::vector<bool> > neighbours_mat = std::vector<std::vector<bool> >(neighbours.size(), neigbour_row);
 
-  for (int r = 0; r < neighbours.size(); ++r) {
+  for (reg_t r = 0; r < neighbours.size(); ++r) {
     for (RegionVector::iterator it = neighbours[r].begin(); it != neighbours[r].end(); ++it) {
       neighbours_mat[r][*it] = true;
     }

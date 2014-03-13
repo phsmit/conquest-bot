@@ -9,7 +9,7 @@ import math
 import itertools
 import scipy.stats
 
-
+print "#pragma GCC diagnostic ignored \"-Wmissing-braces\""
 print "#define NBINOM_X_RANGE {}".format(X_RANGE)
 print "#define NBINOM_N_RANGE {}".format(N_RANGE)
 
@@ -24,8 +24,9 @@ for d in range(N_RANGE):
         values.append(scipy.stats.nbinom.cdf(a,d,0.6))
 
 values = [v if not math.isnan(v) else -1.0 for v in values]
+values = [v if v > 0.0001 else 0.0 for v in values]
 
-print ",".join("{:.{precision}}".format(v, precision=precision) for v in
+print ",".join("{:.{precision}}f".format(v, precision=precision) for v in
                values)
 
 print "};"
@@ -40,9 +41,10 @@ for d in range(N_RANGE):
         values.append(scipy.stats.nbinom.cdf(a,d,0.7))
 
 values = [v if not math.isnan(v) else -1.0 for v in values]
+values = [v if v > 0.0001 else 0.0 for v in values]
 
 
-print ",".join("{:.{precision}}".format(v, precision=precision) for v in
+print ",".join("{:.{precision}}f".format(v, precision=precision) for v in
                values)
 
 print "};"

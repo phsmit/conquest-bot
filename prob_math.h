@@ -26,7 +26,7 @@ float nbinom_cdf(int n, int x, TABLE t) {
   return 0.0;
 }
 
-float get_win_prob(int attackers, int defenders) {
+float get_win_prob(army_t attackers, army_t defenders) {
 
   float attack_success = nbinom_cdf(defenders, attackers - defenders, ATTACK);
   float defence_success = nbinom_cdf(attackers, defenders - attackers, DEFENCE);
@@ -34,17 +34,17 @@ float get_win_prob(int attackers, int defenders) {
   return attack_success * (1 - defence_success);
 }
 
-int attackers_needed(int defenders, double win_chance) {
+army_t attackers_needed(army_t defenders, double win_chance) {
   if (defenders == 0) return 0;
-  int attackers = defenders;
+  army_t attackers = defenders;
   while (get_win_prob(attackers, defenders) < win_chance) ++attackers;
   return attackers;
 
 }
 
-int defenders_needed(int attackers, double defend_chance) {
+army_t defenders_needed(army_t attackers, double defend_chance) {
   if (attackers <= 0) return 0;
-  int defenders = 0;
+  army_t defenders = 0;
   while (get_win_prob(attackers, defenders) > (1 - defend_chance)) ++defenders;
 
   return defenders;

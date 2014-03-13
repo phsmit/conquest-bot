@@ -5,12 +5,6 @@
 #include <set>
 
 namespace {
-bool element_in_vector(reg_t element, RegionVector v) {
-  for (RegionVector::iterator it = v.begin(); it != v.end(); ++it) {
-    if (element == *it) return true;
-  }
-  return false;
-}
 
 army_t sum_vector(ArmyVector v) {
   army_t sum = 0;
@@ -41,7 +35,7 @@ PlacementVector BasicStrategy::place_armies(army_t n) {
   army_t max_neighbour_armies = 0;
   reg_t max_region = 0;
 
-  for (size_t r = 0; r < bot.region_n; ++r) {
+  for (reg_t r = 0; r < bot.region_n; ++r) {
     if (bot.owner[r] != ME) continue;
     army_t army_neighbours = bot.get_enemy_neighbour_armies(r);
     if (army_neighbours > max_neighbour_armies) {
@@ -61,7 +55,7 @@ PlacementVector BasicStrategy::place_armies(army_t n) {
 MoveVector BasicStrategy::do_moves(ArmyVector &armies) {
   MoveVector moves;
 
-  for (size_t r = 0; r < bot.region_n; ++r) {
+  for (reg_t r = 0; r < bot.region_n; ++r) {
     if (bot.owner[r] != ME) continue;
     if (armies[r] == 0) continue;
 
@@ -71,7 +65,7 @@ MoveVector BasicStrategy::do_moves(ArmyVector &armies) {
     } else {
       reg_t closest_enemy_region = UNKNOWN_REGION;
       int enemy_distance = bot.region_n;
-      for (size_t possible_region = 0; possible_region < bot.region_n; ++possible_region) {
+      for (reg_t possible_region = 0; possible_region < bot.region_n; ++possible_region) {
         if (bot.owner[possible_region] == ME) continue;
         if (bot.distances[r][possible_region] < enemy_distance) {
           closest_enemy_region = possible_region;
@@ -82,7 +76,7 @@ MoveVector BasicStrategy::do_moves(ArmyVector &armies) {
       if (closest_enemy_region == UNKNOWN_REGION) continue;
 
       reg_t target_region = UNKNOWN_REGION;
-      for (size_t neigh_region = 0; neigh_region < bot.region_n; ++neigh_region) {
+      for (reg_t neigh_region = 0; neigh_region < bot.region_n; ++neigh_region) {
         if (!bot.neighbours[r][neigh_region]) continue;
         if (bot.distances[neigh_region][closest_enemy_region] < enemy_distance) {
           target_region = neigh_region;
@@ -220,7 +214,7 @@ PlacementVector AquireContinentStrategy::place_armies(army_t n) {
 
   if (n == 0) return pv;
 
-  for (size_t r = 0; r < bot.region_n; ++r) {
+  for (reg_t r = 0; r < bot.region_n; ++r) {
     if (bot.owner[r] != ME) continue;
     if (bot.region_super[r] != super_region) continue;
 
@@ -246,7 +240,7 @@ MoveVector AquireContinentStrategy::do_moves(ArmyVector &armies) {
     } else {
       reg_t closest_enemy_region = UNKNOWN_REGION;
       int enemy_distance = bot.region_n;
-      for (size_t possible_region = 0; possible_region < bot.region_n; ++possible_region) {
+      for (reg_t possible_region = 0; possible_region < bot.region_n; ++possible_region) {
         if (bot.owner[possible_region] == ME) continue;
         if (bot.distances[r][possible_region] < enemy_distance) { // bug!!! (not fixed yet because of refactoring)
           closest_enemy_region = possible_region;
@@ -257,7 +251,7 @@ MoveVector AquireContinentStrategy::do_moves(ArmyVector &armies) {
       if (closest_enemy_region == UNKNOWN_REGION) continue;
 
       reg_t target_region = UNKNOWN_REGION;
-      for (size_t neigh_region = 0; neigh_region < bot.region_n; ++neigh_region) {
+      for (reg_t neigh_region = 0; neigh_region < bot.region_n; ++neigh_region) {
         if (!bot.neighbours[r][neigh_region]) continue;
         if (bot.distances[neigh_region][closest_enemy_region] < enemy_distance) {
           target_region = neigh_region;
@@ -329,7 +323,7 @@ MoveVector AquireContinentStrategy::generate_attacks(reg_t r, ArmyVector &armies
 
 army_t AquireContinentStrategy::get_local_neighbour_armies(reg_t region) {
   army_t num_neighbours = 0;
-  for (size_t r = 0; r < bot.region_n; ++r) {
+  for (reg_t r = 0; r < bot.region_n; ++r) {
     if (!bot.neighbours[region][r]) continue;
     if (bot.owner[r] == ME) continue;
     if (bot.region_super[r] != super_region) continue;
@@ -341,7 +335,7 @@ army_t AquireContinentStrategy::get_local_neighbour_armies(reg_t region) {
 void DefenseStrategy::update() {
   active_ = false;
   need = ArmyVector(bot.region_n, 0);
-  for (size_t r = 0; r < bot.region_n; ++r) {
+  for (reg_t r = 0; r < bot.region_n; ++r) {
     if (bot.owner[r] != ME) continue;
     for (reg_t nr = 0; nr < bot.region_n; ++nr) {
       if (bot.owner[nr] != OTHER) continue;
@@ -371,7 +365,7 @@ double DefenseStrategy::get_priority() const {
 
 PlacementVector DefenseStrategy::place_armies(army_t n) {
   PlacementVector pv;
-  for (size_t r = 0; r < bot.region_n; ++r) {
+  for (reg_t r = 0; r < bot.region_n; ++r) {
     if (need[r] > 0) {
       army_t armies_used = std::min(n, need[r]);
       n -= armies_used;

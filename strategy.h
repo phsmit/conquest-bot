@@ -12,6 +12,7 @@ public:
 
   Strategy(GameData &bot): bot(bot) {
   }
+  virtual ~Strategy() {}
 
   virtual bool active() {
     return false;
