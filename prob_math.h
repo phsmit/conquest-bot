@@ -1,66 +1,53 @@
 #ifndef CONQUEST_PROB_MATH_H_
 #define CONQUEST_PROB_MATH_H_
 
+#include "nbinom-cdf-gen.h"
+
 namespace conquest {
 namespace internal {
 
-#include <assert.h>
-#include <math.h>
+enum TABLE {
+  ATTACK, DEFENCE
+};
 
-unsigned long long factorial(int x) {
-  if (x <= 1) return 1;
+float nbinom_cdf(int n, int x, TABLE t) {
+  if (n < 1) return 1.0;
+  if (x < 0) return 0.0;
 
-  return factorial(x - 1) * x;
-}
+  if (x >= NBINOM_X_RANGE) return 1.0;
+  if (n >= NBINOM_N_RANGE) return 0.0;
 
-unsigned long long bin_coefficient(int n, int k) {
-  return factorial(n + k) / (factorial(n) * factorial(k));
-}
-
-double log_bin_coefficient(int n, int k) {
-  double x = n;
-  double y = k;
-  double result = (x * log(x)) - (y * log(y)) - ((x - y) * log(x - y));
-  return result;
-}
-
-double kill_exactly_n(int trials, int n, double prob) {
-  assert (trials >= n);
-  if (trials > 20) {
-    return exp(log(pow(prob, n)) + log(pow((1.0 - prob), trials - n))
-        + log_bin_coefficient(trials - n, n));
+  switch (t) {
+    case ATTACK:
+      return NBINOM_CDF_06[n][x];
+    case DEFENCE:
+      return NBINOM_CDF_07[n][x];
   }
-  return pow(prob, n) * pow((1.0 - prob), trials - n) * double(bin_coefficient(trials - n, n));
+  return 0.0;
 }
 
-double win_chance(int attackers, int defenders, double attack_prob) {
-  if (attackers < defenders) return 0.0;
-  if (attackers >  defenders * 2 ) return 1.0;
+float get_win_prob(int attackers, int defenders) {
 
-  if (attackers > 20) return 0.0;
+  float attack_success = nbinom_cdf(defenders, attackers - defenders, ATTACK);
+  float defence_success = nbinom_cdf(attackers, defenders - attackers, DEFENCE);
 
-  double win_chance = 0.0;
-  for (int n = defenders; n <= attackers; ++n) {
-    win_chance += kill_exactly_n(attackers, n, attack_prob);
-  }
-  return win_chance;
-}
-
-double get_win_prob(int attackers, int defenders) {
-  float ATTACK_CHANCE = 0.6;
-  float DEFEND_CHANCE = 0.7;
-
-  double attack_success = win_chance(attackers, defenders, ATTACK_CHANCE);
-  double defence_succes = win_chance(defenders, attackers, DEFEND_CHANCE);
-
-  return attack_success * (1 - defence_succes);
+  return attack_success * (1 - defence_success);
 }
 
 int attackers_needed(int defenders, double win_chance) {
   if (defenders == 0) return 0;
   int attackers = defenders;
-  while(get_win_prob(attackers, defenders) < win_chance) ++attackers;
+  while (get_win_prob(attackers, defenders) < win_chance) ++attackers;
   return attackers;
+
+}
+
+int defenders_needed(int attackers, double defend_chance) {
+  if (attackers <= 0) return 0;
+  int defenders = 0;
+  while (get_win_prob(attackers, defenders) > (1 - defend_chance)) ++defenders;
+
+  return defenders;
 }
 
 }
