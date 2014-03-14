@@ -2,19 +2,10 @@
 
 #include "prob_math.h"
 
+#include "strategies/aquire_continent.h"
+
 #include <set>
 #include "util.h"
-
-namespace {
-
-army_t sum_vector(ArmyVector v) {
-  army_t sum = 0;
-  for (auto count : v) {
-    sum += count;
-  }
-  return sum;
-}
-}
 
 bool BasicStrategy::active() {
   return true;
@@ -350,11 +341,11 @@ bool DefenseStrategy::active() {
 }
 
 army_t DefenseStrategy::armies_needed() {
-  return sum_vector(need);
+  return sum(need);
 }
 
 double DefenseStrategy::get_priority() const {
-  return -1.0 * sum_vector(need);
+  return -1.0 * sum(need);
 }
 
 PlacementVector DefenseStrategy::place_armies(army_t n) {

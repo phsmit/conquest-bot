@@ -40,3 +40,10 @@ template<class T>
 RangeClass<T> range(T i) {
   return RangeClass<T>(i);
 }
+
+template<class T>
+typename T::value_type sum(T container) {
+  typename T::value_type sum_ = 0;
+  for (auto value : container) sum_ += value;
+  return sum_;
+}
