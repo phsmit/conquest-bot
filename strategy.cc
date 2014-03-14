@@ -2,8 +2,6 @@
 
 #include "prob_math.h"
 
-#include "strategies/aquire_continent.h"
-
 #include <set>
 #include "util.h"
 
@@ -180,7 +178,7 @@ void AquireContinentStrategy::update() {
     }
   }
 
-  need = conquest::internal::attackers_needed(indirect_enemies, WIN_PROB) + sum_vector(army_need);
+  need = conquest::internal::attackers_needed(indirect_enemies, WIN_PROB) + sum(army_need);
 }
 
 army_t AquireContinentStrategy::armies_needed() {
