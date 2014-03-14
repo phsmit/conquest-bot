@@ -5,20 +5,6 @@
 #include <set>
 #include "util.h"
 
-bool BasicStrategy::active() {
-  return true;
-}
-
-void BasicStrategy::update() {
-}
-
-army_t BasicStrategy::armies_needed() {
-  return 10000;
-}
-
-double BasicStrategy::get_priority() const {
-  return -1.0 * 100000;
-}
 
 PlacementVector BasicStrategy::place_armies(army_t n) {
   //place armies on one region, the one with the most neighbour armies
@@ -178,11 +164,7 @@ void AquireContinentStrategy::update() {
     }
   }
 
-  need = conquest::internal::attackers_needed(indirect_enemies, WIN_PROB) + sum(army_need);
-}
-
-army_t AquireContinentStrategy::armies_needed() {
-  return need;
+  armies_need = conquest::internal::attackers_needed(indirect_enemies, WIN_PROB) + sum(army_need);
 }
 
 PlacementVector AquireContinentStrategy::place_armies(army_t n) {
@@ -206,7 +188,6 @@ PlacementVector AquireContinentStrategy::place_armies(army_t n) {
 
     pv.push_back({r, n});
     break;
-
   }
   return pv;
 }
@@ -251,7 +232,6 @@ MoveVector AquireContinentStrategy::do_moves(ArmyVector &armies) {
     }
   }
   return moves;
-
 }
 
 MoveVector AquireContinentStrategy::generate_attacks(reg_t r, ArmyVector &armies) {
@@ -332,18 +312,20 @@ void DefenseStrategy::update() {
       }
     }
   }
+  armies_need = sum(need);
 }
 
-bool DefenseStrategy::active() {
-  return active_;
+void DefendContinentStrategy::update() {
+  active_ = false;
+  armies_need = 0;
 }
 
-army_t DefenseStrategy::armies_needed() {
-  return sum(need);
+PlacementVector DefendContinentStrategy::place_armies(army_t n) {
+  return PlacementVector();
 }
 
-double DefenseStrategy::get_priority() const {
-  return -1.0 * sum(need);
+MoveVector DefendContinentStrategy::do_moves(ArmyVector &armies) {
+  return MoveVector();
 }
 
 PlacementVector DefenseStrategy::place_armies(army_t n) {
@@ -360,19 +342,6 @@ PlacementVector DefenseStrategy::place_armies(army_t n) {
   return pv;
 }
 
-void DefendContinentStrategy::update() {
-  active_ = false;
-  need = 0;
-}
-
-army_t DefendContinentStrategy::armies_needed() {
-  return Strategy::armies_needed();
-}
-
-PlacementVector DefendContinentStrategy::place_armies(army_t n) {
-  return Strategy::place_armies(n);
-}
-
-MoveVector DefendContinentStrategy::do_moves(ArmyVector &armies) {
-  return Strategy::do_moves(armies);
+MoveVector DefenseStrategy::do_moves(ArmyVector &armies) {
+  return MoveVector();
 }

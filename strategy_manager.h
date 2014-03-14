@@ -42,11 +42,11 @@ public:
 
   void init() {
     for (auto super_region : range(data.super_n)) {
-      strategies.push_back(new FootholdStrategy(data, super_region));
+//      strategies.push_back(new FootholdStrategy(data, super_region));
       strategies.push_back(new AquireContinentStrategy(data, super_region));
       strategies.push_back(new DefendContinentStrategy(data, super_region));
     }
-    strategies.push_back(new KillAllEnemiesStrategy(data));
+//    strategies.push_back(new KillAllEnemiesStrategy(data));
     strategies.push_back(new BasicStrategy(data));
     strategies.push_back(new DefenseStrategy(data));
     initialized = true;
