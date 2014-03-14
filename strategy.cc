@@ -354,7 +354,7 @@ army_t DefenseStrategy::armies_needed() {
 }
 
 double DefenseStrategy::get_priority() const {
-  return -1 * sum_vector(need);
+  return -1.0 * sum_vector(need);
 }
 
 PlacementVector DefenseStrategy::place_armies(army_t n) {

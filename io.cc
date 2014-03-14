@@ -72,17 +72,16 @@ bool read_setup(str line, str &command, str &sub_command, str &data) {
   return false;
 };
 
-void read_until_command(std::istream &in, str test_command, str &data) {
-  while (true) {
-    str line;
-    std::getline(in, line);
-
+bool read_until_command(std::istream &in, str test_command, str &data) {
+  str line;
+  while (std::getline(in, line)) {
     if (!line.compare(0, test_command.size(), test_command)) {
       data = "";
       if (line.size() > test_command.size() + 1) data = line.substr(test_command.size() + 1);
-      return;
+      return true;
     }
   }
+  return false;
 }
 }
 
@@ -157,18 +156,21 @@ void IOManager::run_game_loop(StrategyManager &manager) {
   str data;
   army_t starting_armies;
   while (true) {
-    read_until_command(std::cin, "settings starting_armies", data);
+    if (!read_until_command(std::cin, "settings starting_armies", data)) break;
     starting_armies = atoi(data.c_str());
 
-    read_until_command(std::cin, "update_map", data);
+    if (!read_until_command(std::cin, "update_map", data)) break;
     manager.process_updates(parse_updates(data));
 
-    read_until_command(std::cin, "opponent_moves", data);
+    if (!read_until_command(std::cin, "opponent_moves", data)) break;
     manager.process_opponent_moves(parse_moves(data));
 
     manager.start_new_round(starting_armies);
 
+    if (!read_until_command(std::cin, "go place_armies", data)) break;
     write_placements(manager.place_armies());
+
+    if (!read_until_command(std::cin, "go attack/transfer", data)) break;
     write_moves(manager.make_moves());
 
     if (manager.finished()) {

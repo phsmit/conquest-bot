@@ -31,7 +31,7 @@ public:
 
   army_t avail_armies;
 
-  StrategyManager(GameData &data): data(data) {
+  StrategyManager(GameData &data): data(data), turn(0) {
     initialized = false;
   };
 
@@ -64,7 +64,7 @@ public:
 
   PlacementVector place_armies() {
     std::cerr << "Round " << turn << std::endl;
-    update_strategies();
+//    update_strategies();
 
     PlacementVector pv;
     army_t armies_available = avail_armies;
