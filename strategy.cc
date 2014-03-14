@@ -316,12 +316,41 @@ void DefenseStrategy::update() {
 }
 
 void DefendContinentStrategy::update() {
-  active_ = false;
+  active_ = true;
+  num_defenders = ArmyVector(data.region_n, 0);
   armies_need = 0;
+
+  for (auto region : data.regions_by_super[super_region]) {
+    if (data.owner[region] != ME) {
+      active_ = false;
+      return;
+    }
+
+    army_t max_attackers = 0;
+    for (auto neighbour : data.neighbour_ids[region]) {
+      if (data.owner[neighbour] == OTHER) {
+        max_attackers = std::max(max_attackers, data.occupancy[neighbour] + 5 - 1);
+      }
+    }
+    army_t defenders_needed = conquest::internal::defenders_needed(max_attackers, DEFENSE_PROB);
+    //TODO take into account to move first units from neighbouring countries
+    num_defenders[region] = defenders_needed;
+    if (defenders_needed > data.occupancy[region]) {
+      armies_need += defenders_needed - data.occupancy[region];
+    }
+  }
 }
 
 PlacementVector DefendContinentStrategy::place_armies(army_t n) {
-  return PlacementVector();
+  PlacementVector pv;
+  for (auto region : data.regions_by_super[super_region]) {
+    if (num_defenders[region] > data.occupancy[region]) {
+      army_t place_armies = std::min(n, num_defenders[region] - data.occupancy[region]);
+      n -= place_armies;
+      pv.push_back({region, place_armies});
+    }
+  }
+  return pv;
 }
 
 MoveVector DefendContinentStrategy::do_moves(ArmyVector &armies) {

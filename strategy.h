@@ -57,7 +57,6 @@ class AquireContinentStrategy : public Strategy {
 private:
   static constexpr double WIN_PROB = 0.9;
   const reg_t super_region;
-  army_t need;
   ArmyVector army_need;
 
 public:
@@ -75,10 +74,12 @@ public:
 
 class DefendContinentStrategy : public Strategy {
 private:
-  army_t need;
+  static constexpr double DEFENSE_PROB = 0.7;
+  const reg_t super_region;
+  ArmyVector num_defenders;
 
 public:
-  DefendContinentStrategy(GameData &data, reg_t super_region): Strategy(data) {
+  DefendContinentStrategy(GameData &data, reg_t super_region): Strategy(data), super_region(super_region) {
     name = "Defend " + SUPER_REGION_NAMES[super_region];
   }
 

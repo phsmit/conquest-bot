@@ -6,6 +6,7 @@ class GameData {
 public:
   const ArmyVector super_award;
   const RegionVector region_super;
+  const std::vector<RegionVector> regions_by_super;
 
   const std::vector<std::vector<bool> > neighbours;
   const std::vector<RegionVector> neighbour_ids;

@@ -10,6 +10,14 @@ bool has_negative_values(std::vector<int> v) {
   return false;
 }
 
+std::vector<RegionVector> make_regions_by_super(reg_t num_supers, RegionVector region_super) {
+  std::vector<RegionVector> regions_by_super(num_supers);
+  for (auto r : range(region_super.size())) {
+    regions_by_super[region_super[r]].push_back(r);
+  }
+  return regions_by_super;
+}
+
 std::vector<std::vector<int> > make_distance_mat(std::vector<RegionVector> neighbours) {
   std::vector<int> distance_row(neighbours.size(), -1);
   std::vector<std::vector<int> > distances = std::vector<std::vector<int> >(neighbours.size(), distance_row);
@@ -48,6 +56,7 @@ std::vector<std::vector<bool> > make_neighbour_mat(std::vector<RegionVector> nei
 
 GameData::GameData(CanonicalGameSetup setup): super_award(setup.super_award),
                                               region_super(setup.region_super),
+                                              regions_by_super(make_regions_by_super(setup.super_award.size(), setup.region_super)),
                                               neighbours(make_neighbour_mat(setup.neighbours)),
                                               neighbour_ids(setup.neighbours),
                                               distances(make_distance_mat(setup.neighbours)),
