@@ -9,8 +9,7 @@ import math
 import itertools
 import scipy.stats
 
-print "#ifndef CONQUEST_NBINOM_CDF_GEN_H_"
-print "#define CONQUEST_NBINOM_CDF_GEN_H_"
+print "#pragma once"
 
 print "#pragma GCC diagnostic ignored \"-Wmissing-braces\""
 print "#define NBINOM_X_RANGE {}".format(X_RANGE)
@@ -51,7 +50,3 @@ print ",".join("{:.{precision}}f".format(v, precision=precision) for v in
                values)
 
 print "};"
-
-
-print "#endif //CONQUEST_NBINOM_CDF_GEN_H_ "
-

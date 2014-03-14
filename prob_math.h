@@ -1,5 +1,4 @@
-#ifndef CONQUEST_PROB_MATH_H_
-#define CONQUEST_PROB_MATH_H_
+#pragma once
 
 #include "gen/nbinom-cdf-gen.h"
 
@@ -52,5 +51,3 @@ army_t defenders_needed(army_t attackers, double defend_chance) {
 
 }
 }
-
-#endif // CONQUEST_PROB_MATH_H_

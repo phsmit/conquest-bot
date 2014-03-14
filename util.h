@@ -1,6 +1,4 @@
-#ifndef CONQUEST_UTIL_H_
-#define CONQUEST_UTIL_H_
-
+#pragma once
 
 template<class T>
 class RangeClass {
@@ -42,5 +40,3 @@ template<class T>
 RangeClass<T> range(T i) {
   return RangeClass<T>(i);
 }
-
-#endif // CONQUEST_UTIL_H_

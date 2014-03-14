@@ -1,5 +1,4 @@
-#ifndef CONQUEST_STRATEGY_H_
-#define CONQUEST_STRATEGY_H_
+#pragma once
 
 #include "gamedata.h"
 #include "gen/names-gen.h"
@@ -166,6 +165,3 @@ public:
 
   MoveVector generate_attacks(reg_t region, ArmyVector &armies);
 };
-
-
-#endif //CONQUEST_STRATEGY_H_

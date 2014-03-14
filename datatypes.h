@@ -1,5 +1,4 @@
-#ifndef CONQUEST_DATATYPES_H_
-#define CONQUEST_DATATYPES_H_
+#pragma once
 
 #include <cstdint>
 
@@ -53,5 +52,3 @@ struct CanonicalGameSetup {
   std::vector<RegionVector> neighbours;
   RegionVector init_options;
 };
-
-#endif //CONQUEST_DATATYPES_H_

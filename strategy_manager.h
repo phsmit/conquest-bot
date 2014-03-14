@@ -1,5 +1,4 @@
-#ifndef CONQUEST_STRATEGY_MANAGER_H_
-#define CONQUEST_STRATEGY_MANAGER_H_
+#pragma once
 
 #include "datatypes.h"
 #include "gamedata.h"
@@ -142,5 +141,3 @@ public:
     return rv;
   }
 };
-
-#endif // CONQUEST_STRATEGY_MANAGER_H_

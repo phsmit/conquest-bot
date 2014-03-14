@@ -1,5 +1,4 @@
-#ifndef CONQUEST_GAMEDATA_H_
-#define CONQUEST_GAMEDATA_H_
+#pragma once
 
 #include "datatypes.h"
 
@@ -29,5 +28,3 @@ public:
 
   army_t count_neighbour_armies(reg_t region, Owner owner) const;
 };
-
-#endif // CONQUEST_GAMEDATA_H_
