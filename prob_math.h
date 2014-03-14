@@ -1,7 +1,7 @@
 #ifndef CONQUEST_PROB_MATH_H_
 #define CONQUEST_PROB_MATH_H_
 
-#include "nbinom-cdf-gen.h"
+#include "gen/nbinom-cdf-gen.h"
 
 namespace conquest {
 namespace internal {

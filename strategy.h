@@ -2,7 +2,7 @@
 #define CONQUEST_STRATEGY_H_
 
 #include "gamedata.h"
-#include "names-gen.h"
+#include "gen/names-gen.h"
 
 class Strategy {
 protected:
