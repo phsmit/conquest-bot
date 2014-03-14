@@ -35,7 +35,7 @@ std::vector<std::vector<bool> > make_neighbour_mat(std::vector<RegionVector> nei
   std::vector<bool> neigbour_row(neighbours.size(), false);
   std::vector<std::vector<bool> > neighbours_mat = std::vector<std::vector<bool> >(neighbours.size(), neigbour_row);
 
-  for (auto r : make_range(neighbours.size())) {
+  for (auto r : range(neighbours.size())) {
     for (auto neighbour : neighbours[r]) {
       neighbours_mat[r][neighbour] = true;
     }
@@ -62,7 +62,7 @@ GameData::GameData(CanonicalGameSetup setup): super_award(setup.super_award),
 
 army_t GameData::get_enemy_neighbour_armies(reg_t region) const {
   army_t num_neighbours = 0;
-  for (auto r : make_range(region_n)) {
+  for (auto r : range(region_n)) {
     if (!neighbours[region][r]) continue;
     if (owner[r] == ME) continue;
     num_neighbours += occupancy[r];
@@ -71,7 +71,7 @@ army_t GameData::get_enemy_neighbour_armies(reg_t region) const {
 }
 
 bool GameData::has_enemy_neighbours(reg_t region) const {
-  for (auto r : make_range(region_n)) {
+  for (auto r : range(region_n)) {
     if (!neighbours[region][r]) continue;
     if (owner[r] != ME) return true;
   }

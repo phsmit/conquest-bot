@@ -3,10 +3,10 @@
 
 
 template<class T>
-class Range {
+class RangeClass {
   T n;
 public:
-  Range(T n): n(n) {}
+  RangeClass(T n): n(n) {}
 
   class Iterator {
   private:
@@ -39,8 +39,8 @@ public:
 };
 
 template<class T>
-Range<T> make_range(T i) {
-  return Range<T>(i);
+RangeClass<T> range(T i) {
+  return RangeClass<T>(i);
 }
 
 #endif // CONQUEST_UTIL_H_

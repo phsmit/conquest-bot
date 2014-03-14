@@ -42,7 +42,7 @@ public:
   }
 
   void init() {
-    for (auto super_region : make_range(data.super_n)) {
+    for (auto super_region : range(data.super_n)) {
       strategies.push_back(new FootholdStrategy(data, super_region));
       strategies.push_back(new AquireContinentStrategy(data, super_region));
       strategies.push_back(new DefendContinentStrategy(data, super_region));
@@ -85,7 +85,7 @@ public:
 
   MoveVector make_moves() {
     std::vector<army_t> army_surplus(data.region_n, 0);
-    for (auto r : make_range(data.region_n)) {
+    for (auto r : range(data.region_n)) {
       if (data.owner[r] != ME) continue;
       army_surplus[r] = data.occupancy[r] - 1;
     }

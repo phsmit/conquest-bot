@@ -36,7 +36,7 @@ PlacementVector BasicStrategy::place_armies(army_t n) {
   army_t max_neighbour_armies = 0;
   reg_t max_region = 0;
 
-  for (auto r : make_range(data.region_n)) {
+  for (auto r : range(data.region_n)) {
     if (data.owner[r] != ME) continue;
     army_t army_neighbours = data.get_enemy_neighbour_armies(r);
     if (army_neighbours > max_neighbour_armies) {
@@ -55,7 +55,7 @@ PlacementVector BasicStrategy::place_armies(army_t n) {
 MoveVector BasicStrategy::do_moves(ArmyVector &armies) {
   MoveVector moves;
 
-  for (auto r : make_range(data.region_n)) {
+  for (auto r : range(data.region_n)) {
     if (data.owner[r] != ME) continue;
     if (armies[r] == 0) continue;
 
@@ -65,7 +65,7 @@ MoveVector BasicStrategy::do_moves(ArmyVector &armies) {
     } else {
       reg_t closest_enemy_region = UNKNOWN_REGION;
       int enemy_distance = data.region_n;
-      for (auto possible_region : make_range(data.region_n)) {
+      for (auto possible_region : range(data.region_n)) {
         if (data.owner[possible_region] == ME) continue;
         if (data.distances[r][possible_region] < enemy_distance) {
           closest_enemy_region = possible_region;
@@ -76,7 +76,7 @@ MoveVector BasicStrategy::do_moves(ArmyVector &armies) {
       if (closest_enemy_region == UNKNOWN_REGION) continue;
 
       reg_t target_region = UNKNOWN_REGION;
-      for (auto neigh_region : make_range(data.region_n)) {
+      for (auto neigh_region : range(data.region_n)) {
         if (!data.neighbours[r][neigh_region]) continue;
         if (data.distances[neigh_region][closest_enemy_region] < enemy_distance) {
           target_region = neigh_region;
@@ -152,7 +152,7 @@ void AquireContinentStrategy::update() {
   active_ = false;
   bool enemies_present = false;
 
-  for (auto r : make_range(data.region_n)) {
+  for (auto r : range(data.region_n)) {
     if (data.region_super[r] != super_region) continue;
     if (data.owner[r] != ME) {
       enemies_present = true;
@@ -165,14 +165,14 @@ void AquireContinentStrategy::update() {
   if (!enemies_present) active_ = false;
   if (!active_) return;
 
-  for (auto r : make_range(data.region_n)) {
+  for (auto r : range(data.region_n)) {
     if (data.region_super[r] != super_region) continue;
     if (data.owner[r] == ME) continue;
 
     army_t armies_needed = conquest::internal::attackers_needed(data.occupancy[r], WIN_PROB);
     reg_t optimal_neighbour_id = UNKNOWN_REGION;
     army_t optimal_neighbour_armies = 0;
-    for (auto nr : make_range(data.region_n)) {
+    for (auto nr : range(data.region_n)) {
       if (!data.neighbours[r][nr]) continue;
       if ((unused_armies[nr] < optimal_neighbour_armies && unused_armies[nr] >= armies_needed) ||
           (unused_armies[nr] > optimal_neighbour_armies && optimal_neighbour_armies < armies_needed)) {
@@ -198,7 +198,7 @@ army_t AquireContinentStrategy::armies_needed() {
 
 PlacementVector AquireContinentStrategy::place_armies(army_t n) {
   PlacementVector pv;
-  for (auto r : make_range(data.region_n)) {
+  for (auto r : range(data.region_n)) {
     if (data.region_super[r] != super_region) continue;
     if (army_need[r] > 0) {
       army_t armies_used = std::min(n, army_need[r]);
@@ -211,7 +211,7 @@ PlacementVector AquireContinentStrategy::place_armies(army_t n) {
 
   if (n == 0) return pv;
 
-  for (auto r : make_range(data.region_n)) {
+  for (auto r : range(data.region_n)) {
     if (data.owner[r] != ME) continue;
     if (data.region_super[r] != super_region) continue;
 
@@ -225,7 +225,7 @@ PlacementVector AquireContinentStrategy::place_armies(army_t n) {
 MoveVector AquireContinentStrategy::do_moves(ArmyVector &armies) {
   MoveVector moves;
 
-  for (auto r : make_range(data.region_n)) {
+  for (auto r : range(data.region_n)) {
     if (data.owner[r] != ME) continue;
     if (data.region_super[r] != super_region) continue;
     if (armies[r] == 0) continue;
@@ -236,7 +236,7 @@ MoveVector AquireContinentStrategy::do_moves(ArmyVector &armies) {
     } else {
       reg_t closest_enemy_region = UNKNOWN_REGION;
       int enemy_distance = data.region_n;
-      for (auto possible_region : make_range(data.region_n)) {
+      for (auto possible_region : range(data.region_n)) {
         if (data.owner[possible_region] == ME) continue;
         if (data.distances[r][possible_region] < enemy_distance) { // bug!!! (not fixed yet because of refactoring)
           closest_enemy_region = possible_region;
@@ -247,7 +247,7 @@ MoveVector AquireContinentStrategy::do_moves(ArmyVector &armies) {
       if (closest_enemy_region == UNKNOWN_REGION) continue;
 
       reg_t target_region = UNKNOWN_REGION;
-      for (auto neigh_region : make_range(data.region_n)) {
+      for (auto neigh_region : range(data.region_n)) {
         if (!data.neighbours[r][neigh_region]) continue;
         if (data.distances[neigh_region][closest_enemy_region] < enemy_distance) {
           target_region = neigh_region;
@@ -317,7 +317,7 @@ MoveVector AquireContinentStrategy::generate_attacks(reg_t r, ArmyVector &armies
 
 army_t AquireContinentStrategy::get_local_neighbour_armies(reg_t region) {
   army_t num_neighbours = 0;
-  for (auto r : make_range(data.region_n)) {
+  for (auto r : range(data.region_n)) {
     if (!data.neighbours[region][r]) continue;
     if (data.owner[r] == ME) continue;
     if (data.region_super[r] != super_region) continue;
@@ -329,9 +329,9 @@ army_t AquireContinentStrategy::get_local_neighbour_armies(reg_t region) {
 void DefenseStrategy::update() {
   active_ = false;
   need = ArmyVector(data.region_n, 0);
-  for (auto r : make_range(data.region_n)) {
+  for (auto r : range(data.region_n)) {
     if (data.owner[r] != ME) continue;
-    for (auto nr : make_range(data.region_n)) {
+    for (auto nr : range(data.region_n)) {
       if (data.owner[nr] != OTHER) continue;
       if (!data.neighbours[r][nr]) continue;
 
@@ -359,7 +359,7 @@ double DefenseStrategy::get_priority() const {
 
 PlacementVector DefenseStrategy::place_armies(army_t n) {
   PlacementVector pv;
-  for (auto r : make_range(data.region_n)) {
+  for (auto r : range(data.region_n)) {
     if (need[r] > 0) {
       army_t armies_used = std::min(n, need[r]);
       n -= armies_used;

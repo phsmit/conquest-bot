@@ -5,7 +5,7 @@
 
 int main(int argc, char **argv) {
   reg_t b = 12;
-  for (auto i : make_range(b)) {
+  for (auto i : range(b)) {
     std::cout << sizeof(i) << std::endl;
     std::cout << i << std::endl;
   }
