@@ -21,6 +21,9 @@ public:
   ArmyVector occupancy;
   std::vector<bool> visible;
 
+  std::vector<bool> super_totally_owned;
+  std::vector<bool> super_absent;
+
   GameData(CanonicalGameSetup setup);
 
   army_t get_enemy_neighbour_armies(reg_t region) const;
