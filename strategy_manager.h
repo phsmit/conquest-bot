@@ -2,6 +2,7 @@
 
 #include "datatypes.h"
 #include "gamedata.h"
+#include "rand.h"
 #include "strategy.h"
 #include "util.h"
 #include <algorithm>
@@ -22,15 +23,18 @@ bool compareStrategy(const Strategy *s1, const Strategy *s2) {
 }
 class StrategyManager {
 public:
-  std::vector<Strategy *> strategies;
   GameData &data;
+  randg_t rand_engine;
+
+  std::vector<Strategy *> strategies;
+
   bool initialized;
 
   int turn;
 
   army_t avail_armies;
 
-  StrategyManager(GameData &data): data(data), turn(0) {
+  StrategyManager(GameData &data, randg_t rand_engine): data(data), rand_engine(rand_engine), turn(0) {
     initialized = false;
   };
 
@@ -133,8 +137,7 @@ public:
   RegionVector pick_starting_regions() {
     RegionVector rv;
     RegionVector regions = data.init_regions;
-    std::srand(regions[0] + 1); // plus 1 is to keep compatible with earlier versions
-    std::random_shuffle(regions.begin(), regions.end());
+    std::shuffle(regions.begin(), regions.end(), rand_engine);
     for (int i = 0; i < 6; ++i) {
       rv.push_back(regions[i]);
     }

@@ -1,5 +1,4 @@
-#ifndef CONQUEST_IO_H_
-#define CONQUEST_IO_H_
+#pragma once
 
 #include "strategy_manager.h"
 
@@ -25,5 +24,3 @@ public:
 
   void run_game_loop(StrategyManager &manager);
 };
-
-#endif  // CONQUEST_IO_H_
