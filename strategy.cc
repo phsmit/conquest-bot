@@ -27,7 +27,7 @@ army_t BasicStrategy::place_armies2(army_t n) {
 }
 
 unsigned BasicStrategy::do_moves2() {
-  unsigned num_moves;
+  unsigned num_moves = 0;
 
   for (auto r : range(data.region_n)) {
     if (data.cur_state().owner[r] != ME) continue;

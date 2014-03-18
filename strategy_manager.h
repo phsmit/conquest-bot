@@ -84,6 +84,13 @@ public:
   }
 
   MoveVector make_moves() {
+    data.cur_plan().occupancy = ArmyVector(data.cur_state().occupancy);
+    for (auto region : range(data.region_n)) {
+      if (data.cur_state().owner[region] == ME && data.cur_plan().occupancy[region] > 1) {
+        data.cur_plan().available_armies[region] = data.cur_plan().occupancy[region] - 1;
+      }
+    }
+
     std::sort(strategies.begin(), strategies.end(), compareStrategyMovePrio); // TODO change to move priority
 
     for (auto strategy : strategies) {

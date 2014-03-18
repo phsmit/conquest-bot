@@ -62,14 +62,7 @@ GameData::GameData(CanonicalGameSetup setup): super_award(setup.super_award),
                                               distances(make_distance_mat(setup.neighbours)),
                                               super_n(setup.super_award.size()),
                                               region_n(setup.region_super.size()),
-                                              init_regions(setup.init_options)
-//    ,
-//                                              owner(std::vector<Owner>(setup.region_super.size(), NEUTRAL)),
-//                                              occupancy(ArmyVector(setup.region_super.size(), 2)),
-//                                              visible(std::vector<bool>(setup.region_super.size(), false))
-{
-}
-
+                                              init_regions(setup.init_options) {}
 
 army_t GameData::get_enemy_neighbour_armies(reg_t region) const {
   army_t num_neighbours = 0;
