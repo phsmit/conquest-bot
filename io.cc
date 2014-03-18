@@ -156,15 +156,15 @@ void IOManager::run_game_loop(StrategyManager &manager) {
   army_t starting_armies;
   while (true) {
     if (!read_until_command(std::cin, "settings starting_armies", data)) break;
-    starting_armies = atoi(data.c_str());
+    starting_armies = std::stoi(data);
 
     if (!read_until_command(std::cin, "update_map", data)) break;
-    manager.process_updates(parse_updates(data));
+    UpdateVector updates = parse_updates(data);
 
     if (!read_until_command(std::cin, "opponent_moves", data)) break;
-    manager.process_opponent_moves(parse_moves(data));
+    MoveVector opponent_moves = parse_moves(data);
 
-    manager.start_new_round(starting_armies);
+    manager.start_round(updates, opponent_moves, starting_armies);
 
     if (!read_until_command(std::cin, "go place_armies", data)) break;
     write_placements(manager.place_armies());

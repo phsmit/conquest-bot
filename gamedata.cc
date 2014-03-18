@@ -62,10 +62,12 @@ GameData::GameData(CanonicalGameSetup setup): super_award(setup.super_award),
                                               distances(make_distance_mat(setup.neighbours)),
                                               super_n(setup.super_award.size()),
                                               region_n(setup.region_super.size()),
-                                              init_regions(setup.init_options),
-                                              owner(std::vector<Owner>(setup.region_super.size(), NEUTRAL)),
-                                              occupancy(ArmyVector(setup.region_super.size(), 2)),
-                                              visible(std::vector<bool>(setup.region_super.size(), false)) {
+                                              init_regions(setup.init_options)
+//    ,
+//                                              owner(std::vector<Owner>(setup.region_super.size(), NEUTRAL)),
+//                                              occupancy(ArmyVector(setup.region_super.size(), 2)),
+//                                              visible(std::vector<bool>(setup.region_super.size(), false))
+{
 }
 
 
@@ -73,8 +75,8 @@ army_t GameData::get_enemy_neighbour_armies(reg_t region) const {
   army_t num_neighbours = 0;
   for (auto r : range(region_n)) {
     if (!neighbours[region][r]) continue;
-    if (owner[r] == ME) continue;
-    num_neighbours += occupancy[r];
+    if (states[round].owner[r] == ME) continue;
+    num_neighbours += states[round].occupancy[r];
   }
   return num_neighbours;
 }
@@ -82,7 +84,7 @@ army_t GameData::get_enemy_neighbour_armies(reg_t region) const {
 bool GameData::has_enemy_neighbours(reg_t region) const {
   for (auto r : range(region_n)) {
     if (!neighbours[region][r]) continue;
-    if (owner[r] != ME) return true;
+    if (states[round].owner[r] != ME) return true;
   }
   return false;
 }
@@ -90,8 +92,8 @@ bool GameData::has_enemy_neighbours(reg_t region) const {
 army_t GameData::count_neighbour_armies(reg_t region, Owner owner_) const {
   army_t count = 0;
   for (auto neighbour : neighbour_ids[region]) {
-    if (owner[neighbour] == owner_)
-      count += occupancy[neighbour];
+    if (states[round].owner[neighbour] == owner_)
+      count += states[round].occupancy[neighbour];
   }
   return count;
 }

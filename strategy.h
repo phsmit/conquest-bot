@@ -3,7 +3,6 @@
 #include "gamedata.h"
 #include "gen/names-gen.h"
 
-
 // IDEAS for strategies
 //class FootholdStrategy
 //class KillAllEnemiesStrategy
@@ -11,81 +10,99 @@
 class Strategy {
 protected:
   GameData &data;
-  bool active_;
-  army_t armies_need;
+
+
+  bool active;
+  army_t total_need;
+  army_t current_need;
+  double move_priority;
 
 public:
   str name;
 
-  Strategy(GameData &data): data(data) {
-  }
+  Strategy(GameData &data) : data(data) { }
   virtual ~Strategy() {}
 
-  virtual bool active() const {
-    return active_;
+  void start_round() {
+//    cur_state = states.back();
+//    cur_plan = plans.back();
   }
 
-  virtual army_t armies_needed() const {
-    return armies_need;
+  virtual bool is_active() const {
+    return active;
   }
 
-  virtual double get_priority() const {
-    return -1.0 * armies_need;
+  virtual army_t total_army_need() const {
+    return total_need;
+  }
+
+  virtual army_t current_army_need() const {
+    return current_need;
+  }
+
+  virtual double get_move_priority() const {
+    return -1.0 * total_need;
   }
 
   virtual void update() = 0;
-  virtual PlacementVector place_armies(army_t n) = 0;
-  virtual MoveVector do_moves(ArmyVector &armies) = 0;
+  virtual army_t place_armies2(army_t n) = 0;
+  virtual unsigned do_moves2() = 0;
+};
+
+class SuperRegionStrategy : public Strategy {
+protected:
+  reg_t super_region;
+public:
+  SuperRegionStrategy(GameData &data, reg_t super_region) : Strategy(data), super_region(super_region) {}
 };
 
 class BasicStrategy : public Strategy {
 public:
   BasicStrategy(GameData &data): Strategy(data) {
     name = "Basic strategy";
-    active_ = true;
-    armies_need = 10000;
+    active = true;
+    total_need = 10000;
+    current_need = 10000;
   }
 
   virtual void update() {};
-  virtual PlacementVector place_armies(army_t n);
-  virtual MoveVector do_moves(ArmyVector &armies);
+  virtual army_t place_armies2(army_t n);
+  virtual unsigned do_moves2();
 
   MoveVector generate_attacks(reg_t region, ArmyVector &armies);
 };
 
-class AquireContinentStrategy : public Strategy {
+class AquireContinentStrategy : public SuperRegionStrategy {
 private:
   static constexpr double WIN_PROB = 0.9;
-  const reg_t super_region;
   ArmyVector army_need;
 
 public:
-  AquireContinentStrategy(GameData &data, reg_t super_region): Strategy(data), super_region(super_region) {
+  AquireContinentStrategy(GameData &data, reg_t super_region): SuperRegionStrategy(data, super_region) {
     name = "Aquire " + SUPER_REGION_NAMES[super_region];
   }
 
   virtual void update();
-  virtual PlacementVector place_armies(army_t n);
-  virtual MoveVector do_moves(ArmyVector &armies);
+  virtual army_t place_armies2(army_t n);
+  virtual unsigned do_moves2();
 
   army_t get_local_neighbour_armies(reg_t region);
   MoveVector generate_attacks(reg_t region, ArmyVector &armies);
 };
 
-class DefendContinentStrategy : public Strategy {
+class DefendContinentStrategy : public SuperRegionStrategy {
 private:
   static constexpr double DEFENSE_PROB = 0.7;
-  const reg_t super_region;
   ArmyVector num_defenders;
 
 public:
-  DefendContinentStrategy(GameData &data, reg_t super_region): Strategy(data), super_region(super_region) {
+  DefendContinentStrategy(GameData &data, reg_t super_region): SuperRegionStrategy(data, super_region) {
     name = "Defend " + SUPER_REGION_NAMES[super_region];
   }
 
   virtual void update();
-  virtual PlacementVector place_armies(army_t n);
-  virtual MoveVector do_moves(ArmyVector &armies);
+  virtual army_t place_armies2(army_t n);
+  virtual unsigned do_moves2();
 };
 
 class DefenseStrategy : public Strategy {
@@ -101,6 +118,6 @@ public:
   }
 
   virtual void update();
-  virtual PlacementVector place_armies(army_t n);
-  virtual MoveVector do_moves(ArmyVector &armies);
+  virtual army_t place_armies2(army_t n);
+  virtual unsigned do_moves2();
 };

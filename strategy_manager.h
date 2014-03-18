@@ -17,9 +17,14 @@ army_t count_armies(PlacementVector &pv) {
   return armies;
 }
 
-bool compareStrategy(const Strategy *s1, const Strategy *s2) {
-  return s1->get_priority() > s2->get_priority();
+bool compareStrategyTotalNeed(const Strategy *s1, const Strategy *s2) {
+  return s1->total_army_need() < s2->total_army_need();
 }
+
+bool compareStrategyMovePrio(const Strategy *s1, const Strategy *s2) {
+  return s1->get_move_priority() > s2->get_move_priority();
+}
+
 }
 class StrategyManager {
 public:
@@ -45,6 +50,7 @@ public:
   }
 
   void init() {
+    data.init();
     for (auto super_region : range(data.super_n)) {
 //      strategies.push_back(new FootholdStrategy(data, super_region));
       strategies.push_back(new AquireContinentStrategy(data, super_region));
@@ -56,82 +62,41 @@ public:
     initialized = true;
   }
 
-  void update_strategies() {
-    if (!initialized) init();
-    for (auto strategy : strategies) {
-      strategy->update();
-    }
-
-    std::sort(strategies.begin(), strategies.end(), compareStrategy);
-  }
-
   PlacementVector place_armies() {
-    std::cerr << "Round " << turn << std::endl;
-//    update_strategies();
+    data.plans[data.round].placements.clear();
 
-    PlacementVector pv;
-    army_t armies_available = avail_armies;
+    army_t armies_available = data.states[data.round].place_armies;
 
-    //for (size_t s = 0; s < strategies.size(); ++s) {
+    std::sort(strategies.begin(), strategies.end(), compareStrategyTotalNeed);
+
     for (auto strategy : strategies) {
-      if (strategy->active()) {
-        army_t need = strategy->armies_needed();
-        std::cerr << strategy->name << " active. Army need: " << need << std::endl;
+      if (strategy->is_active()) {
+        army_t need = strategy->current_army_need();
+        std::cerr << strategy->name << " Total: " << strategy->total_army_need() << ", Current: " << need;
 
-        PlacementVector ret = strategy->place_armies(std::min(need, armies_available));
-        armies_available -= count_armies(ret);
-        pv.insert(pv.end(), ret.begin(), ret.end());
+        army_t armies_placed = strategy->place_armies2(std::min(need, armies_available));
+        std::cerr << ", Actual: " << armies_placed << std::endl;
+        armies_available -= armies_placed;
       }
     }
-    return pv;
+
+    return data.plans[data.round].placements;
   }
 
   MoveVector make_moves() {
-    std::vector<army_t> army_surplus(data.region_n, 0);
-    for (auto r : range(data.region_n)) {
-      if (data.owner[r] != ME) continue;
-      army_surplus[r] = data.occupancy[r] - 1;
-    }
+    std::sort(strategies.begin(), strategies.end(), compareStrategyMovePrio); // TODO change to move priority
 
-    MoveVector mv;
     for (auto strategy : strategies) {
-      if (strategy->active()) {
-        MoveVector ret = strategy->do_moves(army_surplus);
-        mv.insert(mv.end(), ret.begin(), ret.end());
+      if (strategy->is_active()) {
+        unsigned moves_done = strategy->do_moves2();
+        std::cerr << strategy->name << " Num Moves: " << moves_done << std::endl;
       }
     }
-    return mv;
+    return data.plans[data.round].moves;
   }
 
   bool finished() {
     return false;
-  }
-
-  void process_updates(UpdateVector updates) {
-    data.visible = std::vector<bool>(data.region_n, false);
-    for (UpdateVector::iterator it = updates.begin(); it != updates.end(); ++it) {
-      data.owner[it->region] = it->player;
-      data.occupancy[it->region] = it->amount;
-      data.visible[it->region] = true;
-    }
-
-    for (reg_t r = 0; r < data.region_n; ++r) {
-      if (data.owner[r] != ME) continue;
-      if (!data.visible[r]) {
-        data.owner[r] = OTHER;
-        data.occupancy[r] = 2;
-      }
-    }
-  }
-
-  void process_opponent_moves(MoveVector moves) {
-//TODO implement
-  }
-
-  void start_new_round(army_t armies) {
-    turn++;
-    avail_armies = armies;
-    update_strategies();
   }
 
   RegionVector pick_starting_regions() {
@@ -143,4 +108,21 @@ public:
     }
     return rv;
   }
+
+  void start_round(UpdateVector updates, MoveVector opponent_moves, army_t place_armies) {
+    if (!initialized) init();
+    turn++;
+
+    std::cerr << "Round " << turn << std::endl;
+
+    data.start_round(updates, opponent_moves, place_armies);
+
+    // Update all strategies to new round
+    for (auto strategy : strategies) {
+      strategy->start_round();
+      strategy->update();
+    }
+  }
+
+
 };
